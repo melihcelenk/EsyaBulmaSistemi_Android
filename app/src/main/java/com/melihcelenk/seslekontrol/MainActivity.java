@@ -1,4 +1,4 @@
-package com.melihcelenk.SesleKontrol;
+package com.melihcelenk.seslekontrol;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;

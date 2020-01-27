@@ -1,4 +1,4 @@
-package com.melihcelenk.SesleKontrol;
+package com.melihcelenk.seslekontrol;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

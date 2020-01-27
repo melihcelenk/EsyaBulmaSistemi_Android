@@ -1,4 +1,4 @@
-package com.melihcelenk.SesleKontrol;
+package com.melihcelenk.seslekontrol;
 
 import android.content.Context;
 

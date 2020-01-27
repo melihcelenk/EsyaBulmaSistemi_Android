@@ -1,4 +1,4 @@
-package com.melihcelenk.SesleKontrol;
+package com.melihcelenk.seslekontrol;
 
 public class NodeData {
     private int nodeId;

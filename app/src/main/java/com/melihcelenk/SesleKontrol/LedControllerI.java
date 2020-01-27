@@ -10,4 +10,7 @@ public interface LedControllerI {
 
     @GET("LED=OFF")
     Call<ResponseBody> closeLed();
+
+    @GET("me")
+    Call<NodeData> getNodeInfo();
 }

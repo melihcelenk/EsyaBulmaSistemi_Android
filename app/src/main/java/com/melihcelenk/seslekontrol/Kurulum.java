@@ -5,15 +5,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.stealthcopter.networktools.IPTools;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Kurulum extends AppCompatActivity {
 
@@ -84,7 +93,10 @@ public class Kurulum extends AppCompatActivity {
         SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
             @Override
             public void onDeviceFound(Device device) {
-                IPDiziyeEkle(device.ip);
+                //if(arananCihazMi(device.ip) == true){
+                    arananCihazMi(String.valueOf(device.ip));
+                    IPDiziyeEkle(device.ip);
+                //}
                 //appendResultsText(device.ip);
             }
 
@@ -96,4 +108,37 @@ public class Kurulum extends AppCompatActivity {
             }
         });
     }
+
+    public Boolean arananCihazMi(String ipAdresi){
+        final Boolean[] arananMi = new Boolean[1];
+        String url="http://" + ipAdresi;
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+
+                .build();
+        LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
+        ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
+
+            @Override
+            public void onResponse(Call<NodeData> call, Response<NodeData> response) {
+                //NODEDATA NULLPOINTER VERİYOR DÜZELT
+                Log.v("me response",response.body().toString());
+                arananMi[0] = true;
+            }
+
+            @Override
+            public void onFailure(Call<NodeData> call, Throwable t) {
+                Log.e("me error:",t.getMessage());
+                arananMi[0] = false;
+            }
+        });
+
+        return arananMi[0];
+    }
+
+
 }

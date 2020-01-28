@@ -63,10 +63,16 @@ public class Kurulum extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 sonucText.append(text + "\n");
+            }
+        });
+    }
+    private void IPDiziyeEkle(final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
                 bulunanCihazlarArray.add(text);
-
+                mAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -78,14 +84,15 @@ public class Kurulum extends AppCompatActivity {
         SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
             @Override
             public void onDeviceFound(Device device) {
-                appendResultsText("Device: " + device.ip+" "+ device.hostname);
+                IPDiziyeEkle(device.ip);
+                //appendResultsText(device.ip);
             }
 
             @Override
             public void onFinished(ArrayList<Device> devicesFound) {
                 float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
-                appendResultsText("Devices Found: " + devicesFound.size());
-                appendResultsText("Finished "+timeTaken+" s");
+                //appendResultsText("Devices Found: " + devicesFound.size());
+                //appendResultsText("Finished "+timeTaken+" s");
             }
         });
     }

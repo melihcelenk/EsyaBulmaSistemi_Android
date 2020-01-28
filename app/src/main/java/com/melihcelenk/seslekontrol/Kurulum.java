@@ -33,11 +33,9 @@ public class Kurulum extends AppCompatActivity {
         bulunanCihazlarArray = new ArrayList<String>();
 
         cihazlarRV = (RecyclerView) findViewById(R.id.cihazlarRV);
-        cihazlarRV.setHasFixedSize(true);
-
+        cihazlarRV.setHasFixedSize(true); //
         layoutManager = new LinearLayoutManager(this);
         cihazlarRV.setLayoutManager(layoutManager);
-
         mAdapter = new cihazlarAdapter(bulunanCihazlarArray);
         cihazlarRV.setAdapter(mAdapter);
 

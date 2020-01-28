@@ -1,6 +1,8 @@
 package com.melihcelenk.seslekontrol;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +18,11 @@ import java.util.ArrayList;
 public class Kurulum extends AppCompatActivity {
 
     TextView sonucText;
+    ArrayList<String> bulunanCihazlarArray;
+
+    private RecyclerView cihazlarRV;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +30,17 @@ public class Kurulum extends AppCompatActivity {
         setContentView(R.layout.activity_kurulum);
 
         sonucText = findViewById(R.id.sonucText);
+        bulunanCihazlarArray = new ArrayList<String>();
+
+        cihazlarRV = (RecyclerView) findViewById(R.id.cihazlarRV);
+        cihazlarRV.setHasFixedSize(true);
+
+        layoutManager = new LinearLayoutManager(this);
+        cihazlarRV.setLayoutManager(layoutManager);
+
+        mAdapter = new cihazlarAdapter(bulunanCihazlarArray);
+        cihazlarRV.setAdapter(mAdapter);
+
         InetAddress ipAddress = IPTools.getLocalIPv4Address();
         if (ipAddress != null){
             // IP ADRESİ BULUNAMADI - YAPILACAK
@@ -47,7 +65,10 @@ public class Kurulum extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 sonucText.append(text + "\n");
+                bulunanCihazlarArray.add(text);
+
             }
         });
     }

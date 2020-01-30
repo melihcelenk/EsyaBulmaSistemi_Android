@@ -15,9 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".PinBelirle"></activity>
+        <activity android:name=".PinBelirleActivity"></activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".Kurulum">
+        <activity android:name=".KurulumActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

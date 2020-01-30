@@ -24,13 +24,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class Kurulum extends AppCompatActivity {
+public class KurulumActivity extends AppCompatActivity {
 
     TextView sonucText;
     ArrayList<String> bulunanCihazlarArray;
 
     private RecyclerView cihazlarRV;
-    private RecyclerView.Adapter mAdapter;
+    private cihazlarAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
     @Override
@@ -47,6 +47,13 @@ public class Kurulum extends AppCompatActivity {
         cihazlarRV.setLayoutManager(layoutManager);
         mAdapter = new cihazlarAdapter(bulunanCihazlarArray);
         cihazlarRV.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                bulunanCihazlarArray.set(position,"TIKLANDI");
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
         InetAddress ipAddress = IPTools.getLocalIPv4Address();
         if (ipAddress != null){
@@ -88,22 +95,22 @@ public class Kurulum extends AppCompatActivity {
 
     private void IPBul() {
 
+        appendResultsText("Taranıyor...");
         final long startTimeMillis = System.currentTimeMillis();
 
         SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
             @Override
             public void onDeviceFound(Device device) {
                 if(arananCihazMi(String.valueOf(device.ip)) == true){
-                  //  arananCihazMi(String.valueOf(device.ip));
                     IPDiziyeEkle(device.ip);
                 }
-                //appendResultsText(device.ip);
+
             }
 
             @Override
             public void onFinished(ArrayList<Device> devicesFound) {
                 float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
-                //appendResultsText("Devices Found: " + devicesFound.size());
+                appendResultsText("Devices Found: " + devicesFound.size());
                 //appendResultsText("Finished "+timeTaken+" s");
             }
         });
@@ -125,9 +132,10 @@ public class Kurulum extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<NodeData> call, Response<NodeData> response) {
-                //NODEDATA NULLPOINTER VERİYOR DÜZELT
+
                 if(response.body()!=null){
                     Log.v("Me Cevap:",response.body().toString());
+                    // CİHAZDAN GELEN BİLGİLERE GÖRE DÜZENLENECEK
                     arananMi[0] = true;
                 }
                 else arananMi[0] = false;

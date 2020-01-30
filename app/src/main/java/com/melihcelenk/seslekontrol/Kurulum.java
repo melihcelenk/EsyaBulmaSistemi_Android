@@ -93,10 +93,10 @@ public class Kurulum extends AppCompatActivity {
         SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
             @Override
             public void onDeviceFound(Device device) {
-                //if(arananCihazMi(device.ip) == true){
-                    arananCihazMi(String.valueOf(device.ip));
+                if(arananCihazMi(String.valueOf(device.ip)) == true){
+                  //  arananCihazMi(String.valueOf(device.ip));
                     IPDiziyeEkle(device.ip);
-                //}
+                }
                 //appendResultsText(device.ip);
             }
 
@@ -126,18 +126,27 @@ public class Kurulum extends AppCompatActivity {
             @Override
             public void onResponse(Call<NodeData> call, Response<NodeData> response) {
                 //NODEDATA NULLPOINTER VERİYOR DÜZELT
-                Log.v("me response",response.body().toString());
-                arananMi[0] = true;
+                if(response.body()!=null){
+                    Log.v("Me Cevap:",response.body().toString());
+                    arananMi[0] = true;
+                }
+                else arananMi[0] = false;
+
             }
 
             @Override
             public void onFailure(Call<NodeData> call, Throwable t) {
-                Log.e("me error:",t.getMessage());
+                Log.e("Me Hata:",t.getMessage());
                 arananMi[0] = false;
             }
         });
 
+        while(arananMi[0] == null){
+        }
+        Log.v("ArananMi:" , arananMi[0].toString());
         return arananMi[0];
+
+
     }
 
 

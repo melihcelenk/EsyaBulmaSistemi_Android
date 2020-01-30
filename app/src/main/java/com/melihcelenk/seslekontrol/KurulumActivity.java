@@ -27,7 +27,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class KurulumActivity extends AppCompatActivity {
 
     TextView sonucText;
-    ArrayList<String> bulunanCihazlarArray;
+    //ArrayList<String> bulunanCihazlarArray;
+    //SINIF YAZILACAK STRING YERİNE
+    ArrayList<bulunanCihaz> bulunanCihazlarArray;
 
     private RecyclerView cihazlarRV;
     private cihazlarAdapter mAdapter;
@@ -39,7 +41,8 @@ public class KurulumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_kurulum);
 
         sonucText = findViewById(R.id.sonucText);
-        bulunanCihazlarArray = new ArrayList<String>();
+//        bulunanCihazlarArray = new ArrayList<String>();
+        bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
 
         cihazlarRV = (RecyclerView) findViewById(R.id.cihazlarRV);
         cihazlarRV.setHasFixedSize(true); //
@@ -50,8 +53,13 @@ public class KurulumActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                bulunanCihazlarArray.set(position,"TIKLANDI");
+                bulunanCihazlarArray.get(position);
                 mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onLedYakClick(int position) {
+                bulunanCihazlarArray.get(position).LedDegistir();
             }
         });
 
@@ -87,7 +95,7 @@ public class KurulumActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                bulunanCihazlarArray.add(text);
+                bulunanCihazlarArray.add(new bulunanCihaz(text));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -110,7 +118,7 @@ public class KurulumActivity extends AppCompatActivity {
             @Override
             public void onFinished(ArrayList<Device> devicesFound) {
                 float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
-                appendResultsText("Devices Found: " + devicesFound.size());
+                appendResultsText("Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size());
                 //appendResultsText("Finished "+timeTaken+" s");
             }
         });

@@ -4,6 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -12,15 +14,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class cihazlarAdapter extends RecyclerView.Adapter<cihazlarAdapter.MyViewHolder> {
-    private ArrayList<String> mDataset;
+    private ArrayList<bulunanCihaz> mDataset;
 
     private OnItemClickListener mListener;
 
     public void setOnItemClickListener(OnItemClickListener listener){
         mListener = listener;
     }
+
     public interface OnItemClickListener{
         void onItemClick(int position);
+        void onLedYakClick(int position);
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView cihazIPTxt;
@@ -48,7 +52,7 @@ public class cihazlarAdapter extends RecyclerView.Adapter<cihazlarAdapter.MyView
                     if(listener != null){
                         int position = getAdapterPosition();
                         if(position != RecyclerView.NO_POSITION){
-                            listener.onItemClick(position);
+                            listener.onLedYakClick(position);
                         }
                     }
                 }
@@ -56,7 +60,7 @@ public class cihazlarAdapter extends RecyclerView.Adapter<cihazlarAdapter.MyView
         }
     }
 
-    public cihazlarAdapter(ArrayList<String> myDataset) {
+    public cihazlarAdapter(ArrayList<bulunanCihaz> myDataset) {
         mDataset = myDataset;
     }
 
@@ -75,8 +79,10 @@ public class cihazlarAdapter extends RecyclerView.Adapter<cihazlarAdapter.MyView
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        String simdiki = mDataset.get(position);
+        String simdiki = mDataset.get(position).getIp();
+        Boolean ledDurum = mDataset.get(position).getLedDurum();
         holder.cihazIPTxt.setText(simdiki);
+        holder.ledYakSw.setChecked(ledDurum);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

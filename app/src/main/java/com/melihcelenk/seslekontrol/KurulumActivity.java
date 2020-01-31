@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +31,7 @@ public class KurulumActivity extends AppCompatActivity {
     //ArrayList<String> bulunanCihazlarArray;
     //SINIF YAZILACAK STRING YERİNE
     ArrayList<bulunanCihaz> bulunanCihazlarArray;
+    Thread tButon;
 
     private RecyclerView cihazlarRV;
     private cihazlarAdapter mAdapter;
@@ -45,7 +47,8 @@ public class KurulumActivity extends AppCompatActivity {
         bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
 
         cihazlarRV = (RecyclerView) findViewById(R.id.cihazlarRV);
-        cihazlarRV.setHasFixedSize(true); //
+        //cihazlarRV.setHasFixedSize(true);
+        //cihazlarRV.setNestedScrollingEnabled(false);
         layoutManager = new LinearLayoutManager(this);
         cihazlarRV.setLayoutManager(layoutManager);
         mAdapter = new cihazlarAdapter(bulunanCihazlarArray);
@@ -70,24 +73,41 @@ public class KurulumActivity extends AppCompatActivity {
         findViewById(R.id.taraBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                    try {
-                        IPBul();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    }
-                }).start();
+                if(tButon == null || !tButon.isAlive()){
+                    tButon = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                IPBul();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    findViewById(R.id.taraBtn).setEnabled(false);
+
+                }
+                if (tButon.getState() == Thread.State.NEW)
+                {
+                    tButon.start();
+                }
+                else
+                {
+                    Toast.makeText(KurulumActivity.this, "Cihazlar taranamadı.", Toast.LENGTH_SHORT).show();
+                }
+
+
+
             }
         });
     }
-    private void appendResultsText(final String text) {
+    private void sonucTextveButonDegistir(final String text, final Boolean butonDurum) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                sonucText.append(text + "\n");
+                sonucText.setText(text + "\n");
+                //sonucText.append(text + "\n");
+                findViewById(R.id.taraBtn).setEnabled(butonDurum);
             }
         });
     }
@@ -103,25 +123,34 @@ public class KurulumActivity extends AppCompatActivity {
 
     private void IPBul() {
 
-        appendResultsText("Taranıyor...");
+        sonucTextveButonDegistir("Taranıyor...",false);
         final long startTimeMillis = System.currentTimeMillis();
+        try{
+            SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
+                @Override
+                public void onDeviceFound(Device device) {
+                    if(arananCihazMi(String.valueOf(device.ip)) == true){
+                        try {
+                            IPDiziyeEkle(device.ip);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-        SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
-            @Override
-            public void onDeviceFound(Device device) {
-                if(arananCihazMi(String.valueOf(device.ip)) == true){
-                    IPDiziyeEkle(device.ip);
                 }
 
-            }
+                @Override
+                public void onFinished(ArrayList<Device> devicesFound) {
+                    float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
+                    sonucTextveButonDegistir("Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size(),true);
+                    //sonucTextveButonDegistir("Finished "+timeTaken+" s");
+                }
+            });
+        }catch(Exception e){
+            Log.e("IPBulHata",e.getLocalizedMessage());
+            e.printStackTrace();
+        }
 
-            @Override
-            public void onFinished(ArrayList<Device> devicesFound) {
-                float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
-                appendResultsText("Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size());
-                //appendResultsText("Finished "+timeTaken+" s");
-            }
-        });
     }
 
     public Boolean arananCihazMi(String ipAdresi){
@@ -135,32 +164,55 @@ public class KurulumActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create(gson))
 
                 .build();
-        LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-        ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
+        try {
+            LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
+            ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
 
-            @Override
-            public void onResponse(Call<NodeData> call, Response<NodeData> response) {
+                @Override
+                public void onResponse(Call<NodeData> call, Response<NodeData> response) {
 
-                if(response.body()!=null){
-                    Log.v("Me Cevap:",response.body().toString());
-                    // CİHAZDAN GELEN BİLGİLERE GÖRE DÜZENLENECEK
-                    arananMi[0] = true;
+                    if(response.body()!=null){
+                        Log.v("Me Cevap:",response.body().toString());
+                        // CİHAZDAN GELEN BİLGİLERE GÖRE DÜZENLENECEK
+                        arananMi[0] = true;
+                    }
+                    else {
+                        arananMi[0] = false;
+                    }
+
                 }
-                else arananMi[0] = false;
 
-            }
-
-            @Override
-            public void onFailure(Call<NodeData> call, Throwable t) {
-                Log.e("Me Hata:",t.getMessage());
-                arananMi[0] = false;
-            }
-        });
-
-        while(arananMi[0] == null){
+                @Override
+                public void onFailure(Call<NodeData> call, Throwable t) {
+                    Log.e("Me Hata:",t.getMessage());
+                    arananMi[0] = false;
+                }
+            });
+        }catch(Exception e){
+            Log.v("RetrofitHata",e.getLocalizedMessage());
+            e.printStackTrace();
         }
-        Log.v("ArananMi:" , arananMi[0].toString());
-        return arananMi[0];
+
+
+//        while(arananMi[0] == null){
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        /* TODO: */
+        // DÜZENLENECEK: THREAD SONLANDIĞINDA BURAYI ÇALIŞTIRACAK KOD YAZILACAK
+        if(arananMi[0] != null){
+            Log.v("ArananMi:" , arananMi[0].toString() + " IP:" + ipAdresi);
+            return arananMi[0];
+        }
+        else {
+            Log.v("ArananMi:" , "Null" + " IP:" + ipAdresi);
+            return false;
+        }
+
 
 
     }

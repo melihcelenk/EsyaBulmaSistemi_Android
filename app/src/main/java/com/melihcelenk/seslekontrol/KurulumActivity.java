@@ -19,6 +19,7 @@ import com.stealthcopter.networktools.subnet.Device;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,8 +29,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class KurulumActivity extends AppCompatActivity {
 
     TextView sonucText;
-    //ArrayList<String> bulunanCihazlarArray;
-    //SINIF YAZILACAK STRING YERİNE
     ArrayList<bulunanCihaz> bulunanCihazlarArray;
     Thread tButon;
 
@@ -43,7 +42,6 @@ public class KurulumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_kurulum);
 
         sonucText = findViewById(R.id.sonucText);
-//        bulunanCihazlarArray = new ArrayList<String>();
         bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
 
         cihazlarRV = (RecyclerView) findViewById(R.id.cihazlarRV);
@@ -56,8 +54,8 @@ public class KurulumActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                bulunanCihazlarArray.get(position);
-                mAdapter.notifyDataSetChanged();
+                Toast.makeText(KurulumActivity.this, "Led Durumu:" + bulunanCihazlarArray.get(position).getLedDurum().toString(), Toast.LENGTH_SHORT).show();
+                //mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -133,6 +131,7 @@ public class KurulumActivity extends AppCompatActivity {
                         try {
                             IPDiziyeEkle(device.ip);
                         } catch (Exception e) {
+                            Log.e("Diziekle",e.getMessage());
                             e.printStackTrace();
                         }
                     }
@@ -162,11 +161,13 @@ public class KurulumActivity extends AppCompatActivity {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create(gson))
-
                 .build();
         try {
             LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-            ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
+            NodeData nodeData=ledContrrolerIService.getNodeInfo().execute().body();
+            Log.v("Node",nodeData.getIp());
+            return true;
+            /*ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
 
                 @Override
                 public void onResponse(Call<NodeData> call, Response<NodeData> response) {
@@ -187,31 +188,34 @@ public class KurulumActivity extends AppCompatActivity {
                     Log.e("Me Hata:",t.getMessage());
                     arananMi[0] = false;
                 }
-            });
+            });*/
         }catch(Exception e){
             Log.v("RetrofitHata",e.getLocalizedMessage());
             e.printStackTrace();
+            return false;
+
         }
 
 
-//        while(arananMi[0] == null){
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+      /*  while(arananMi[0] == null){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Log.e("Thread ",e.getMessage());
+                e.printStackTrace();
+            }
+        }*/
 
         /* TODO: */
         // DÜZENLENECEK: THREAD SONLANDIĞINDA BURAYI ÇALIŞTIRACAK KOD YAZILACAK
-        if(arananMi[0] != null){
+     /*   if(arananMi[0] != null){
             Log.v("ArananMi:" , arananMi[0].toString() + " IP:" + ipAdresi);
             return arananMi[0];
         }
         else {
             Log.v("ArananMi:" , "Null" + " IP:" + ipAdresi);
             return false;
-        }
+        }*/
 
 
 

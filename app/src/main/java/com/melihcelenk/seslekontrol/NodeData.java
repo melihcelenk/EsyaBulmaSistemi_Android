@@ -3,7 +3,7 @@ package com.melihcelenk.seslekontrol;
 public class NodeData {
     private int nodeId;
     private String ip;
-    private String method;
+    private String macAddress;
 
     public int getNodeId() {
         return nodeId;
@@ -21,16 +21,16 @@ public class NodeData {
         this.ip = ip;
     }
 
-    public String getMethod() {
-        return method;
+    public String getMacAddress() {
+        return macAddress;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
     }
 
     @Override
     public String toString(){
-        return "nodeId:"+getNodeId()+" ip: "+getIp()+ " method: "+getMethod();
+        return "nodeId:"+getNodeId()+" ip: "+getIp()+ " macAddress: "+ getMacAddress();
     }
 }

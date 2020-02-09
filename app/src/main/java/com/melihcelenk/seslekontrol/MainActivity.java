@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -119,15 +121,15 @@ public class MainActivity extends AppCompatActivity {
 
                 .build();
         LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-        ledContrrolerIService.getBolgeBilgi().enqueue(new Callback<Bolge>() {
+        ledContrrolerIService.getNodeData().enqueue(new Callback<NodeData>() {
 
             @Override
-            public void onResponse(Call<Bolge> call, Response<Bolge> response) {
+            public void onResponse(Call<NodeData> call, Response<NodeData> response) {
                 Log.v("me response",response.body().toString());
             }
 
             @Override
-            public void onFailure(Call<Bolge> call, Throwable t) {
+            public void onFailure(Call<NodeData> call, Throwable t) {
                Log.e("me error:",t.getMessage());
             }
         });

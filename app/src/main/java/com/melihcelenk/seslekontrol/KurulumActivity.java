@@ -16,6 +16,8 @@ import com.stealthcopter.networktools.IPTools;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
 
+import org.w3c.dom.Node;
+
 import java.net.InetAddress;
 import java.util.ArrayList;
 
@@ -54,8 +56,12 @@ public class KurulumActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
+
                 Toast.makeText(KurulumActivity.this, "Led Durumu:" + bulunanCihazlarArray.get(position).getLedDurum().toString(), Toast.LENGTH_SHORT).show();
                 //mAdapter.notifyDataSetChanged();
+                //TODO: BULUNANCİHAZ SINIFI IP YERİNE NODE TUTACAK
+                //NodeData node = bulunanCihazlarArray.get(position);
+                //db.ekleVeyaDegistirBolge();
             }
 
             @Override
@@ -109,11 +115,11 @@ public class KurulumActivity extends AppCompatActivity {
             }
         });
     }
-    private void IPDiziyeEkle(final String text) {
+    private void IPDiziyeEkle(final String cihazIP) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                bulunanCihazlarArray.add(new bulunanCihaz(text));
+                bulunanCihazlarArray.add(new bulunanCihaz(cihazIP));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -137,16 +143,23 @@ public class KurulumActivity extends AppCompatActivity {
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
                 @Override
                 public void onDeviceFound(Device device) {
-                    if(arananCihazMi(String.valueOf(device.ip)) == true){
+                    NodeData n;
+                    n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
+
+                    if (n!=null){
                         try {
-                            IPDiziyeEkle(device.ip);
-                        } catch (Exception e) {
+                            IPDiziyeEkle(n.getIp());
+                        }
+                        catch (Exception e) {
                             Log.e("Diziekle",e.getMessage());
                             e.printStackTrace();
                         }
                     }
 
+
                 }
+
+
 
                 @Override
                 public void onFinished(ArrayList<Device> devicesFound) {
@@ -162,7 +175,7 @@ public class KurulumActivity extends AppCompatActivity {
 
     }
 
-    public Boolean arananCihazMi(String ipAdresi){
+    public NodeData arananCihazsaGetir(String ipAdresi){
         final Boolean[] arananMi = new Boolean[1];
         String url="http://" + ipAdresi;
         Gson gson = new GsonBuilder()
@@ -174,60 +187,16 @@ public class KurulumActivity extends AppCompatActivity {
                 .build();
         try {
             LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
-            Bolge bolge = ledControllerIService.getBolgeBilgi().execute().body();
-            Log.v("Node", bolge.get_ipAdresi());
-            return true;
-            /*ledControllerIService.getBolgeBilgi().enqueue(new Callback<Bolge>() {
+            NodeData nodeData = ledControllerIService.getNodeData().execute().body();
+            Log.v("Node", nodeData.getIp());
+            return nodeData;
 
-                @Override
-                public void onResponse(Call<Bolge> call, Response<Bolge> response) {
-
-                    if(response.body()!=null){
-                        Log.v("Me Cevap:",response.body().toString());
-                        // CİHAZDAN GELEN BİLGİLERE GÖRE DÜZENLENECEK
-                        arananMi[0] = true;
-                    }
-                    else {
-                        arananMi[0] = false;
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<Bolge> call, Throwable t) {
-                    Log.e("Me Hata:",t.getMessage());
-                    arananMi[0] = false;
-                }
-            });*/
         }catch(Exception e){
             Log.v("RetrofitHata",e.getLocalizedMessage());
             e.printStackTrace();
-            return false;
+            return null;
 
         }
-
-
-      /*  while(arananMi[0] == null){
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Log.e("Thread ",e.getMessage());
-                e.printStackTrace();
-            }
-        }*/
-
-        /* TODO: */
-        // DÜZENLENECEK: THREAD SONLANDIĞINDA BURAYI ÇALIŞTIRACAK KOD YAZILACAK
-     /*   if(arananMi[0] != null){
-            Log.v("ArananMi:" , arananMi[0].toString() + " IP:" + ipAdresi);
-            return arananMi[0];
-        }
-        else {
-            Log.v("ArananMi:" , "Null" + " IP:" + ipAdresi);
-            return false;
-        }*/
-
-
 
     }
 

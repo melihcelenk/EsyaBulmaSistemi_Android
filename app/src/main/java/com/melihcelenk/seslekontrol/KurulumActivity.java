@@ -56,12 +56,12 @@ public class KurulumActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
-                Toast.makeText(KurulumActivity.this, "Led Durumu:" + bulunanCihazlarArray.get(position).getLedDurum().toString(), Toast.LENGTH_SHORT).show();
+                bulunanCihaz bc = bulunanCihazlarArray.get(position);
+                Toast.makeText(KurulumActivity.this, "Led Durumu:" + bc.getLedDurum().toString(), Toast.LENGTH_SHORT).show();
                 //mAdapter.notifyDataSetChanged();
-                //TODO: BULUNANCİHAZ SINIFI IP YERİNE NODE TUTACAK
-                //NodeData node = bulunanCihazlarArray.get(position);
-                //db.ekleVeyaDegistirBolge();
+                db.ekleVeyaDegistirBolge(new Bolge("ornek1",bc.getMac(),bc.getIp()));
+                // TODO : PENCERE AÇ, ETİKET İSTE, BOLGE KAYDET
+                Log.v("Veritabani","ornek1 " + bc.getMac() + " " + bc.getIp());
             }
 
             @Override
@@ -115,11 +115,11 @@ public class KurulumActivity extends AppCompatActivity {
             }
         });
     }
-    private void IPDiziyeEkle(final String cihazIP) {
+    private void IPDiziyeEkle(final String cihazMAC, final String cihazIP) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                bulunanCihazlarArray.add(new bulunanCihaz(cihazIP));
+                bulunanCihazlarArray.add(new bulunanCihaz(cihazMAC, cihazIP));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -148,7 +148,7 @@ public class KurulumActivity extends AppCompatActivity {
 
                     if (n!=null){
                         try {
-                            IPDiziyeEkle(n.getIp());
+                            IPDiziyeEkle(n.getMacAddress(), n.getIp());
                         }
                         catch (Exception e) {
                             Log.e("Diziekle",e.getMessage());

@@ -68,6 +68,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 "   \"" + bolge.get_macAdresi() + "\"," +
                 "   \"" + bolge.get_ipAdresi() + "\")";
         db.execSQL(EKLE_VEYA_DEGISTIR_BOLGE);
+
+
     }
 
     // code to get the single contact

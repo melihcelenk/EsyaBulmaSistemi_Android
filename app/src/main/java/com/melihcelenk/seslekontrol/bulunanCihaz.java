@@ -7,7 +7,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class bulunanCihaz {
+    private String mac;
 
+    public String getMac(){ return mac; }
     public String getIp() {
         return ip;
     }
@@ -20,11 +22,13 @@ public class bulunanCihaz {
 
     private Boolean ledDurum;
 
-    public bulunanCihaz(String ip){
+    public bulunanCihaz(String mac, String ip){
+        this.mac = mac;
         this.ip = ip;
         ledDurum = false;
     }
-    public bulunanCihaz(String ip, Boolean ledDurum){
+    public bulunanCihaz(String mac, String ip, Boolean ledDurum){
+        this.mac = mac;
         this.ip = ip;
         this.ledDurum = ledDurum;
     }
@@ -33,7 +37,8 @@ public class bulunanCihaz {
         if (ledDurum == false) ledYak();
         else ledKapa();
     }
-    private void ledYak(){ ledYak(ip);
+    private void ledYak(){
+        ledYak(ip);
         // DÜZENLENECEK: EĞER LED YANIYORSA (GET)
         if(true) ledDurum = true;
     }

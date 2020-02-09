@@ -51,6 +51,7 @@ public class KurulumActivity extends AppCompatActivity {
         cihazlarRV.setLayoutManager(layoutManager);
         mAdapter = new cihazlarAdapter(bulunanCihazlarArray);
         cihazlarRV.setAdapter(mAdapter);
+
         mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -66,8 +67,10 @@ public class KurulumActivity extends AppCompatActivity {
 
         InetAddress ipAddress = IPTools.getLocalIPv4Address();
         if (ipAddress != null){
-            // IP ADRESİ BULUNAMADI - YAPILACAK
+            // IP ADRESİ BULUNAMADI - DÜZENLENECEK
         }
+
+        // TARA BUTONU
         findViewById(R.id.taraBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,8 +97,6 @@ public class KurulumActivity extends AppCompatActivity {
                     Toast.makeText(KurulumActivity.this, "Cihazlar taranamadı.", Toast.LENGTH_SHORT).show();
                 }
 
-
-
             }
         });
     }
@@ -118,10 +119,20 @@ public class KurulumActivity extends AppCompatActivity {
             }
         });
     }
+    private void bulunanCihazlarArrayTemizle() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bulunanCihazlarArray.clear();
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 
     private void IPBul() {
 
         sonucTextveButonDegistir("Taranıyor...",false);
+        bulunanCihazlarArrayTemizle();
         final long startTimeMillis = System.currentTimeMillis();
         try{
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {

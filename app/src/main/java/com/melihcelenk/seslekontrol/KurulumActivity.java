@@ -19,10 +19,6 @@ import com.stealthcopter.networktools.subnet.Device;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -31,6 +27,7 @@ public class KurulumActivity extends AppCompatActivity {
     TextView sonucText;
     ArrayList<bulunanCihaz> bulunanCihazlarArray;
     Thread tButon;
+    DatabaseHandler db;
 
     private RecyclerView cihazlarRV;
     private cihazlarAdapter mAdapter;
@@ -40,6 +37,8 @@ public class KurulumActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kurulum);
+
+        db = new DatabaseHandler(this);
 
         sonucText = findViewById(R.id.sonucText);
         bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
@@ -174,14 +173,14 @@ public class KurulumActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         try {
-            LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-            NodeData nodeData=ledContrrolerIService.getNodeInfo().execute().body();
-            Log.v("Node",nodeData.getIp());
+            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
+            Bolge bolge = ledControllerIService.getBolgeBilgi().execute().body();
+            Log.v("Node", bolge.get_ipAdresi());
             return true;
-            /*ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
+            /*ledControllerIService.getBolgeBilgi().enqueue(new Callback<Bolge>() {
 
                 @Override
-                public void onResponse(Call<NodeData> call, Response<NodeData> response) {
+                public void onResponse(Call<Bolge> call, Response<Bolge> response) {
 
                     if(response.body()!=null){
                         Log.v("Me Cevap:",response.body().toString());
@@ -195,7 +194,7 @@ public class KurulumActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<NodeData> call, Throwable t) {
+                public void onFailure(Call<Bolge> call, Throwable t) {
                     Log.e("Me Hata:",t.getMessage());
                     arananMi[0] = false;
                 }

@@ -119,15 +119,15 @@ public class MainActivity extends AppCompatActivity {
 
                 .build();
         LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-        ledContrrolerIService.getNodeInfo().enqueue(new Callback<NodeData>() {
+        ledContrrolerIService.getBolgeBilgi().enqueue(new Callback<Bolge>() {
 
             @Override
-            public void onResponse(Call<NodeData> call, Response<NodeData> response) {
+            public void onResponse(Call<Bolge> call, Response<Bolge> response) {
                 Log.v("me response",response.body().toString());
             }
 
             @Override
-            public void onFailure(Call<NodeData> call, Throwable t) {
+            public void onFailure(Call<Bolge> call, Throwable t) {
                Log.e("me error:",t.getMessage());
             }
         });

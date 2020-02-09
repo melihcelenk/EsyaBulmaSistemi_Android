@@ -12,5 +12,5 @@ public interface LedControllerI {
     Call<ResponseBody> closeLed();
 
     @GET("me")
-    Call<NodeData> getNodeInfo();
+    Call<Bolge> getBolgeBilgi();
 }

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import com.stealthcopter.networktools.IPTools;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
@@ -21,6 +22,9 @@ import org.w3c.dom.Node;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -34,6 +38,16 @@ public class KurulumActivity extends AppCompatActivity {
     private RecyclerView cihazlarRV;
     private cihazlarAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+
+
+    public void bolgeleriGetir(){
+        ArrayList<Bolge> butunBolgeler = (ArrayList<Bolge>) db.getButunBolgeler();
+        for (Bolge cn : butunBolgeler) {
+            String log = "Id: " + cn.get_id() + " ,Etiket: " + cn.get_etiket() + " ,MAC: " + cn.get_macAdresi() + " ,IP: " +
+                    cn.get_ipAdresi();
+            Log.d("BolgeBilgi: ", log);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +71,13 @@ public class KurulumActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 bulunanCihaz bc = bulunanCihazlarArray.get(position);
-                Toast.makeText(KurulumActivity.this, "Led Durumu:" + bc.getLedDurum().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(KurulumActivity.this, "MAC:" + bc.getMac().toString(), Toast.LENGTH_SHORT).show();
                 //mAdapter.notifyDataSetChanged();
-                db.ekleVeyaDegistirBolge(new Bolge("ornek1",bc.getMac(),bc.getIp()));
+                int sonId = db.ekleVeyaDegistirBolge(new Bolge("ornek1",bc.getMac(),bc.getIp()));
+                bolgeleriGetir();
                 // TODO : PENCERE AÇ, ETİKET İSTE, BOLGE KAYDET
-                Log.v("Veritabani","ornek1 " + bc.getMac() + " " + bc.getIp());
+                Log.v("Veritabani",sonId + " ornek1 " + bc.getMac() + " " + bc.getIp());
+                nodeIdGonder(bc.getIp(),String.valueOf(sonId));
             }
 
             @Override
@@ -104,6 +120,45 @@ public class KurulumActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void nodeIdGonder(String ipAdresi, String nodeId){
+
+        String url="http://" + ipAdresi;
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        try {
+            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
+            Call<KonfigurasyonData> call = ledControllerIService.getKonfigurasyonData(nodeId);
+            call.enqueue(new Callback<KonfigurasyonData>() {
+                @Override
+                public void onResponse(Call<KonfigurasyonData> call, Response<KonfigurasyonData> response) {
+                    try{
+                        if(response.isSuccessful()){
+                            KonfigurasyonData konfigurasyonData = response.body();
+                        }
+                    }catch(JsonIOException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<KonfigurasyonData> call, Throwable t) {
+                    Log.v("onFailure","KonfigurasyonData");
+                }
+            });
+
+
+        }catch(Exception e){
+            //Log.v("RetrofitHata",e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+
     }
     private void sonucTextveButonDegistir(final String text, final Boolean butonDurum) {
         runOnUiThread(new Runnable() {
@@ -156,9 +211,7 @@ public class KurulumActivity extends AppCompatActivity {
                         }
                     }
 
-
                 }
-
 
 
                 @Override

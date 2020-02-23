@@ -122,7 +122,7 @@ public class KurulumActivity extends AppCompatActivity {
         });
     }
 
-    public void nodeIdGonder(String ipAdresi, String nodeId){
+    public void nodeIdGonder(String ipAdresi, final String nodeId){
 
         String url="http://" + ipAdresi;
         Gson gson = new GsonBuilder()
@@ -141,6 +141,9 @@ public class KurulumActivity extends AppCompatActivity {
                     try{
                         if(response.isSuccessful()){
                             KonfigurasyonData konfigurasyonData = response.body();
+                            if(konfigurasyonData.getSetNodeId() == nodeId) {
+                                Toast.makeText(KurulumActivity.this, "Cihaz ID'si gönderildi: " + nodeId, Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }catch(JsonIOException e){
                         e.printStackTrace();

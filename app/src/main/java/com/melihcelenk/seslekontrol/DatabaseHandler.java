@@ -28,7 +28,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_BOLGELER_TABLOSU = "CREATE TABLE " + TABLE_BOLGELER + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ETIKET + " TEXT,"
-                + KEY_MAC_ADRESI + " TEXT," + KEY_IP_ADRESI + " TEXT" + ")";
+                + KEY_MAC_ADRESI + " TEXT NOT NULL UNIQUE," + KEY_IP_ADRESI + " TEXT" + ")";
         db.execSQL(CREATE_BOLGELER_TABLOSU);
     }
 
@@ -43,7 +43,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // yeni bölge ekleme
-    void addBolge(Bolge bolge) {
+    long addBolge(Bolge bolge) { // var olan ID'yi silip yeni ID ekliyor
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -53,12 +53,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_IP_ADRESI, bolge.get_ipAdresi());
 
         // Inserting Row
-        db.insert(TABLE_BOLGELER, null, values);
+        //db.insert(TABLE_BOLGELER, null, values);
+        long id = db.insertWithOnConflict(TABLE_BOLGELER,null,values,SQLiteDatabase.CONFLICT_REPLACE);
         //2nd argument is String containing nullColumnHack
         db.close(); // Closing database connection
+        return id;
     }
 
-    void ekleVeyaDegistirBolge(Bolge bolge){
+    public int sonGuncellenenID() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        final String MY_QUERY = "SELECT last_insert_rowid()";
+        Cursor cur = db.rawQuery(MY_QUERY, null);
+        cur.moveToFirst();
+        int ID = cur.getInt(0);
+        cur.close();
+        return ID;
+    }
+
+    int ekleVeyaDegistirBolge(Bolge bolge){
         SQLiteDatabase db = this.getWritableDatabase();
 
         String EKLE_VEYA_DEGISTIR_BOLGE = "insert or replace into bolgeler(id,etiket,mac_adresi,ip_adresi) " +
@@ -68,7 +81,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 "   \"" + bolge.get_macAdresi() + "\"," +
                 "   \"" + bolge.get_ipAdresi() + "\")";
         db.execSQL(EKLE_VEYA_DEGISTIR_BOLGE);
-
+        return sonGuncellenenID();
 
     }
 

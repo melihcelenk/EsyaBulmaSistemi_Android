@@ -85,12 +85,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println("Basarili" + response.toString());
+                System.out.println("Basarili " + response.toString());
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println("Basarisiz" + t.toString());
+                System.out.println("Basarisiz " + t.toString());
             }
         });
     }
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println("Basarisiz" + t.toString());
+                System.out.println("Basarisiz " + t.toString());
             }
         });
     }

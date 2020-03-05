@@ -68,6 +68,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cur.moveToFirst();
         int ID = cur.getInt(0);
         cur.close();
+        db.close();
         return ID;
     }
 
@@ -81,8 +82,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 "   \"" + bolge.get_macAdresi() + "\"," +
                 "   \"" + bolge.get_ipAdresi() + "\")";
         db.execSQL(EKLE_VEYA_DEGISTIR_BOLGE);
-        return sonGuncellenenID();
+        int sonGuncID = sonGuncellenenID();
+        db.close();
 
+        return sonGuncID;
+
+    }
+
+    String etiketGetir(String macAdresi){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String ETIKETGETIR = "select etiket from bolgeler where mac_adresi = \"" + macAdresi + "\"";
+        Cursor cursor = db.rawQuery(ETIKETGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String etiket = cursor.getString(0);
+        cursor.close();
+        db.close();
+        return etiket;
+    }
+    String idGetir(String macAdresi){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String IDGETIR = "select id from bolgeler where mac_adresi = \"" + macAdresi + "\"";
+        Cursor cursor = db.rawQuery(IDGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String id = cursor.getString(0);
+        cursor.close();
+        db.close();
+        return id;
     }
 
     // code to get the single contact

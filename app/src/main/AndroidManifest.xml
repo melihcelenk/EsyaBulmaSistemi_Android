@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".KayitliBolgelerActivity"></activity>
+        <activity android:name=".KonfigureEtActivity"></activity>
+        <activity android:name=".KayitliBolgelerActivity" />
         <activity android:name=".PinBelirleActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".KurulumActivity">

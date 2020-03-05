@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,14 +41,7 @@ public class KurulumActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
 
 
-    public void bolgeleriGetir(){
-        ArrayList<Bolge> butunBolgeler = (ArrayList<Bolge>) db.getButunBolgeler();
-        for (Bolge cn : butunBolgeler) {
-            String log = "Id: " + cn.get_id() + " ,Etiket: " + cn.get_etiket() + " ,MAC: " + cn.get_macAdresi() + " ,IP: " +
-                    cn.get_ipAdresi();
-            Log.d("BolgeBilgi: ", log);
-        }
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +65,11 @@ public class KurulumActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 bulunanCihaz bc = bulunanCihazlarArray.get(position);
-                Toast.makeText(KurulumActivity.this, "MAC:" + bc.getMac().toString(), Toast.LENGTH_SHORT).show();
                 //mAdapter.notifyDataSetChanged();
-                int sonId = db.ekleVeyaDegistirBolge(new Bolge("ornek1",bc.getMac(),bc.getIp()));
-                bolgeleriGetir();
-                // TODO : PENCERE AÇ, ETİKET İSTE, BOLGE KAYDET
-                Log.v("Veritabani",sonId + " ornek1 " + bc.getMac() + " " + bc.getIp());
-                nodeIdGonder(bc.getIp(),String.valueOf(sonId));
+                Intent intent = new Intent(getApplicationContext(),KonfigureEtActivity.class);
+                intent.putExtra("ipAdresi",bc.getIp());
+                intent.putExtra("macAdresi",bc.getMac());
+                startActivity(intent);
             }
 
             @Override
@@ -122,47 +114,7 @@ public class KurulumActivity extends AppCompatActivity {
         });
     }
 
-    public void nodeIdGonder(String ipAdresi, final String nodeId){
 
-        String url="http://" + ipAdresi;
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        try {
-            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
-            Call<KonfigurasyonData> call = ledControllerIService.getKonfigurasyonData(nodeId);
-            call.enqueue(new Callback<KonfigurasyonData>() {
-                @Override
-                public void onResponse(Call<KonfigurasyonData> call, Response<KonfigurasyonData> response) {
-                    try{
-                        if(response.isSuccessful()){
-                            KonfigurasyonData konfigurasyonData = response.body();
-                            if(konfigurasyonData.getSetNodeId() == nodeId) {
-                                Toast.makeText(KurulumActivity.this, "Cihaz ID'si gönderildi: " + nodeId, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }catch(JsonIOException e){
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<KonfigurasyonData> call, Throwable t) {
-                    Log.v("onFailure","KonfigurasyonData");
-                }
-            });
-
-
-        }catch(Exception e){
-            //Log.v("RetrofitHata",e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-
-    }
     private void sonucTextveButonDegistir(final String text, final Boolean butonDurum) {
         runOnUiThread(new Runnable() {
             @Override

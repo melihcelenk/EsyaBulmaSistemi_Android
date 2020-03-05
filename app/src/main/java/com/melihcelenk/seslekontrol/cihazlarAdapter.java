@@ -3,9 +3,6 @@ package com.melihcelenk.seslekontrol;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -32,7 +29,7 @@ public class cihazlarAdapter extends RecyclerView.Adapter<cihazlarAdapter.MyView
 
         public MyViewHolder(View itemView, final OnItemClickListener listener) {
             super(itemView);
-            cihazIPTxt = itemView.findViewById(R.id.cihazIPTxt);
+            cihazIPTxt = itemView.findViewById(R.id.cihazIPTV);
             ledYakSw = itemView.findViewById(R.id.ledYakSw);
 
             itemView.setOnClickListener(new View.OnClickListener() {

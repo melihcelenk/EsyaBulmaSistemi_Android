@@ -53,11 +53,18 @@ public class KonfigureEtActivity extends AppCompatActivity {
         db = new DatabaseHandler(this);
         try{
             cihazIDTV.setText(db.idGetir(macAdresi));
-            bolgeEtiketiET.setText(db.etiketGetir(macAdresi));
-            bolgeEtiketiET.setSelection(bolgeEtiketiET.getText().length());
         }catch(Exception e){
             Log.e("DBHata","Database'den " + macAdresi + " cihazına ait bilgi getirilemedi.");
         }
+        bolgeEtiketiET.setText(db.etiketGetir(macAdresi));
+        try{
+            if((db.ipGetir(macAdresi)!=ipAdresi)){
+                db.ipDegistir(macAdresi,ipAdresi);
+            }
+        }catch(Exception e){
+            Log.e("DBHata","Database'den " + macAdresi + " cihazına ait bilgi getirilemedi.");
+        }
+        bolgeEtiketiET.setSelection(bolgeEtiketiET.getText().length());
 
         cihazKnfgKaydetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +74,7 @@ public class KonfigureEtActivity extends AppCompatActivity {
                 bolgeleriGetir();
                 Log.v("Veritabani",sonId + " | " + bolgeEtiketi + " | " + macAdresi + " | " + ipAdresi);
                 nodeIdGonder(ipAdresi,String.valueOf(sonId));
+
             }
         });
 

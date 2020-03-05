@@ -41,8 +41,6 @@ public class KurulumActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

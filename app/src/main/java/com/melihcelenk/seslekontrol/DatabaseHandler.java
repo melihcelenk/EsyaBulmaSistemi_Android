@@ -88,6 +88,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return sonGuncID;
 
     }
+    int ipDegistir(String mac, String ip){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String IP_DEGISTIR = "update bolgeler set ip_adresi = '" + ip + "' WHERE mac_adresi='" + mac + "'";
+        db.execSQL(IP_DEGISTIR);
+        int sonGuncID = sonGuncellenenID();
+        db.close();
+        return sonGuncID;
+    }
+
 
     String etiketGetir(String macAdresi){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -110,6 +119,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return id;
+    }
+
+    String ipGetir(String macAdresi){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String IPGETIR = "select ip_adresi from bolgeler where mac_adresi = \"" + macAdresi + "\"";
+        Cursor cursor = db.rawQuery(IPGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String ip = cursor.getString(0);
+        cursor.close();
+        db.close();
+        return ip;
     }
 
     // code to get the single contact

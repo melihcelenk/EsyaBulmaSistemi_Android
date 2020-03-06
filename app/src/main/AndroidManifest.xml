@@ -18,8 +18,8 @@
         <activity android:name=".KonfigureEtActivity"></activity>
         <activity android:name=".KayitliBolgelerActivity" />
         <activity android:name=".PinBelirleActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".KurulumActivity">
+        <activity android:name=".KurulumActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

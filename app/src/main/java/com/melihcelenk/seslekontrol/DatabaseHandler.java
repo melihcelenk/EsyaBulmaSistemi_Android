@@ -12,11 +12,17 @@ import java.util.List;
 public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "esyaBulmaVT";
+
     private static final String TABLE_BOLGELER = "bolgeler";
     private static final String KEY_ID = "id";
     private static final String KEY_ETIKET = "etiket";
     private static final String KEY_MAC_ADRESI = "mac_adresi";
     private static final String KEY_IP_ADRESI = "ip_adresi";
+
+    private static final String TABLE_ESYALAR = "esyalar";
+    private static final String KEY_ESYA_ID = "esyaID";
+    private static final String KEY_BOLGE_ID = KEY_ID;
+    private static final String KEY_ESYA_ADI = "esyaAdi";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,6 +36,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ETIKET + " TEXT,"
                 + KEY_MAC_ADRESI + " TEXT NOT NULL UNIQUE," + KEY_IP_ADRESI + " TEXT" + ")";
         db.execSQL(CREATE_BOLGELER_TABLOSU);
+
+        String CREATE_ESYALAR_TABLOSU = "CREATE TABLE " + TABLE_ESYALAR + "("
+                + KEY_ESYA_ID + " INTEGER PRIMARY KEY,"
+                + KEY_BOLGE_ID + " INT NOT NULL,"
+                + KEY_ESYA_ADI + " TEXT NOT NULL," +
+                " FOREIGN KEY ("+ KEY_BOLGE_ID +")" +
+                "       REFERENCES "+TABLE_BOLGELER+" ("+ KEY_ID +") "
+                + ")";
+        db.execSQL(CREATE_ESYALAR_TABLOSU);
     }
 
     // Upgrading database
@@ -37,7 +52,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOLGELER);
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ESYALAR);
         // Create tables again
         onCreate(db);
     }
@@ -45,18 +60,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // yeni bölge ekleme
     long addBolge(Bolge bolge) { // var olan ID'yi silip yeni ID ekliyor
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
-
         values.put(KEY_ETIKET, bolge.get_etiket());
         values.put(KEY_MAC_ADRESI, bolge.get_macAdresi());
         values.put(KEY_IP_ADRESI, bolge.get_ipAdresi());
-
-        // Inserting Row
-        //db.insert(TABLE_BOLGELER, null, values);
         long id = db.insertWithOnConflict(TABLE_BOLGELER,null,values,SQLiteDatabase.CONFLICT_REPLACE);
-        //2nd argument is String containing nullColumnHack
-        db.close(); // Closing database connection
+        db.close();
         return id;
     }
 
@@ -86,8 +95,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
 
         return sonGuncID;
-
     }
+
     int ipDegistir(String mac, String ip){
         SQLiteDatabase db = this.getWritableDatabase();
         String IP_DEGISTIR = "update bolgeler set ip_adresi = '" + ip + "' WHERE mac_adresi='" + mac + "'";
@@ -96,7 +105,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return sonGuncID;
     }
-
 
     String etiketGetir(String macAdresi){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -109,6 +117,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return etiket;
     }
+
     String idGetir(String macAdresi){
         SQLiteDatabase db = this.getReadableDatabase();
         String IDGETIR = "select id from bolgeler where mac_adresi = \"" + macAdresi + "\"";
@@ -132,6 +141,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return ip;
     }
+
+    String ipGetirEtiketIle(String etiket){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String IPGETIR = "select ip_adresi from bolgeler where etiket = \"" + etiket + "\" COLLATE NOCASE";
+        Cursor cursor = db.rawQuery(IPGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String ip = cursor.getString(0);
+        cursor.close();
+        db.close();
+        return ip;
+    }
+    int idGetirEtiketIle(String etiket){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String IDGETIR = "select id from bolgeler where etiket = \"" + etiket + "\" COLLATE NOCASE";
+        Cursor cursor = db.rawQuery(IDGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        int id = cursor.getInt(0);
+        cursor.close();
+        db.close();
+        return id;
+    }
+
 
     // code to get the single contact
     Bolge getBolge(int id) {
@@ -173,6 +206,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return bolgeList;
     }
 
+
     public int updateBolge(Bolge bolge) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -185,7 +219,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return db.update(TABLE_BOLGELER, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(bolge.get_id()) });
     }
-
 
     public void deleteBolge(Bolge bolge) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -203,6 +236,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // return count
         return cursor.getCount();
+    }
+
+    public List<Esya> getButunEsyalar() {
+        List<Esya> esyaList = new ArrayList<Esya>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_ESYALAR;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Esya esya = new Esya();
+                esya.set_esyaId(Integer.parseInt(cursor.getString(0)));
+                esya.set_bolgeId(Integer.parseInt(cursor.getString(1)));
+                esya.set_esyaAdi(cursor.getString(2));
+                // Adding esya to the list
+                esyaList.add(esya);
+            } while (cursor.moveToNext());
+        }
+
+        return esyaList;
+    }
+    long addEsya(Esya esya) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_ESYA_ADI, esya.get_esyaAdi());
+        values.put(KEY_BOLGE_ID, esya.get_bolgeId());
+        long id = db.insert(TABLE_ESYALAR,null,values);
+        db.close();
+        return id;
     }
 
 }

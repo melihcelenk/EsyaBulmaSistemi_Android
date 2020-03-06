@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 
 import org.w3c.dom.Node;
 
@@ -30,19 +32,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     TextView txvResult;
     Retrofit retrofit;
+    DatabaseHandler db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         txvResult = findViewById(R.id.textView);
-
-        String url="http://192.168.1.34";
-        retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .build();
-
-
+        db = new DatabaseHandler(this);
 
     } // onCreate sonu
 
@@ -59,6 +56,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }// getSpeechInput sonu
+    public void kurulum(View view){
+        Intent intent = new Intent(getApplicationContext(),KurulumActivity.class);
+        startActivity(intent);
+    }
+    public void esyaEkle(View view){
+        db.addEsya(new Esya(3,"Kalem"));
+        esyalariGetir();
+    }
+
+    public void esyalariGetir(){
+        ArrayList<Esya> butunEsyalar = (ArrayList<Esya>) db.getButunEsyalar();
+        for (Esya cn : butunEsyalar) {
+            String log = "esyaId: " + cn.get_esyaId() + "\tbolgeId: " + cn.get_bolgeId() + "\tesyaAdi: " + cn.get_esyaAdi();
+            Log.d("BolgeBilgi: ", log);
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -69,9 +82,22 @@ public class MainActivity extends AppCompatActivity {
                 if(resultCode==RESULT_OK && data != null){
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     txvResult.setText(result.get(0));
+
                     if(result.get(0).equals("yak")) ledYak();
                     else if(result.get(0).equals("söndür")) ledKapa();
                     else if(result.get(0).equals("kimsin")) me();
+                    else{
+                        try{
+                            Log.v("SinyalGonder","Gonderilecek");
+                            String sinyalGonderilecekIP = db.ipGetirEtiketIle(result.get(0));
+                            Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
+                            int sinyalGonderilecekID = db.idGetirEtiketIle(result.get(0));
+                            Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
+                            SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID);
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
 
@@ -80,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
     }// onActivityResult sonu
 
     public void ledYak(){
+        String url="http://192.168.0.103";
+        retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .build();
         LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
         ledContrrolerIService.openLed().enqueue(new Callback<ResponseBody>() {
 
@@ -95,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     public void ledKapa(){
+        String url="http://192.168.0.103";
+        retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .build();
         LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
         ledContrrolerIService.closeLed().enqueue(new Callback<ResponseBody>() {
 
@@ -111,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void me(){
-        String url="http://192.168.1.34";
+        String url="http://192.168.0.103";
+
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -133,5 +168,57 @@ public class MainActivity extends AppCompatActivity {
                Log.e("me error:",t.getMessage());
             }
         });
+    }
+
+    public void SinyalGonder(String ipAdresi, final int id){
+        final Boolean[] arananMi = new Boolean[1];
+        String url="http://" + ipAdresi;
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        try {
+            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
+            Call<SinyalGonderData> call = ledControllerIService.getSinyalGonderData(id,23);
+            call.enqueue(new Callback<SinyalGonderData>() {
+                @Override
+                public void onResponse(Call<SinyalGonderData> call, Response<SinyalGonderData> response) {
+                    try{
+                        Log.v("sinyalResponse","Sinyalden cevap geldi");
+                        if(response.isSuccessful()){
+                            Log.v("sinyalResponse","Cevap başarılı");
+                            SinyalGonderData sinyalGonderData = response.body();
+                            if(sinyalGonderData.getId() == id && sinyalGonderData.getDurum() == 23) {
+                                Toast.makeText(getApplicationContext(), "Sinyal Gonderildi.", Toast.LENGTH_SHORT).show();
+                                Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
+                            }
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Sinyal Gönderilemedi", Toast.LENGTH_SHORT).show();
+                            Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
+                        }
+                    }catch(JsonIOException e){
+                        Log.v("sinyalResponse","Sinyalden gelen cevapta hata oluştu");
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+                @Override
+                public void onFailure(Call<SinyalGonderData> call, Throwable t) {
+                    Log.v("Sinyal","Sinyal Gonderilemedi");
+                }
+            });
+
+
+
+        }catch(Exception e){
+            Log.v("RetrofitHata","Sinyal Gonderilemedi");
+            e.printStackTrace();
+        }
     }
 }

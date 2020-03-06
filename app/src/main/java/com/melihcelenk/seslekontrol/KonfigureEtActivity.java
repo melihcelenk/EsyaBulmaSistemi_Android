@@ -56,7 +56,12 @@ public class KonfigureEtActivity extends AppCompatActivity {
         }catch(Exception e){
             Log.e("DBHata","Database'den " + macAdresi + " cihazına ait bilgi getirilemedi.");
         }
-        bolgeEtiketiET.setText(db.etiketGetir(macAdresi));
+        try{
+            bolgeEtiketiET.setText(db.etiketGetir(macAdresi));
+        }catch(Exception e){
+            Log.e("DBHata","Database'den " + macAdresi + " cihazına ait bilgi getirilemedi.");
+        }
+
         try{
             if((db.ipGetir(macAdresi)!=ipAdresi)){
                 db.ipDegistir(macAdresi,ipAdresi);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String CREATE_ESYALAR_TABLOSU = "CREATE TABLE " + TABLE_ESYALAR + "("
                 + KEY_ESYA_ID + " INTEGER PRIMARY KEY,"
-                + KEY_BOLGE_ID + " INT NOT NULL,"
+                + KEY_BOLGE_ID + " INTEGER NOT NULL,"
                 + KEY_ESYA_ADI + " TEXT NOT NULL," +
                 " FOREIGN KEY ("+ KEY_BOLGE_ID +")" +
                 "       REFERENCES "+TABLE_BOLGELER+" ("+ KEY_ID +") "
@@ -171,7 +172,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_BOLGELER, new String[] { KEY_ID,
-                        KEY_ETIKET, KEY_MAC_ADRESI }, KEY_ID + "=?",
+                        KEY_ETIKET, KEY_MAC_ADRESI, KEY_IP_ADRESI }, KEY_ID + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
@@ -268,6 +269,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long id = db.insert(TABLE_ESYALAR,null,values);
         db.close();
         return id;
+    }
+
+    int bolgeIdGetirEsyaAdiIle(String esyaAdi){
+        SQLiteDatabase db = this.getReadableDatabase();
+        //String BOLGEIDGETIRESYAADIILE = "select "+ KEY_BOLGE_ID +" from "+TABLE_ESYALAR+" where "+KEY_ESYA_ADI+" = \"" + esyaAdi + "\" COLLATE NOCASE";
+        String BOLGEIDGETIRESYAADIILE = "select id from esyalar where esyaAdi = \"" + esyaAdi + "\" COLLATE NOCASE";
+        Cursor cursor = db.rawQuery(BOLGEIDGETIRESYAADIILE, null);
+        int id = -1;
+        if (cursor != null && cursor.getCount()>=1){
+            cursor.moveToFirst();
+            id = Integer.parseInt(cursor.getString(0));
+        }
+        else Log.e("DBHata","EsyaAdi ile BölgeId Getirilemedi");
+
+
+        cursor.close();
+        db.close();
+        return id;
+
     }
 
 }

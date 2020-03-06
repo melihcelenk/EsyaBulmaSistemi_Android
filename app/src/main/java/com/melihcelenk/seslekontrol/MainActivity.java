@@ -61,8 +61,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void esyaEkle(View view){
-        db.addEsya(new Esya(3,"Kalem"));
-        esyalariGetir();
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+
+        if(intent.resolveActivity(getPackageManager()) != null){
+            startActivityForResult(intent, 20);
+        }
+        else{
+            Toast.makeText(this,"Konusma Tanima Desteklenmiyor", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void esyalariGetir(){
@@ -81,26 +89,45 @@ public class MainActivity extends AppCompatActivity {
             case 10:
                 if(resultCode==RESULT_OK && data != null){
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
                     txvResult.setText(result.get(0));
 
-                    if(result.get(0).equals("yak")) ledYak();
-                    else if(result.get(0).equals("söndür")) ledKapa();
-                    else if(result.get(0).equals("kimsin")) me();
+                    String str = result.get(0);
+                    String delims = "nerede+";
+                    String[] tokens = str.split(delims);
+
+                    if(result.get(0).equals("kimsin")) me();
                     else{
                         try{
                             Log.v("SinyalGonder","Gonderilecek");
-                            String sinyalGonderilecekIP = db.ipGetirEtiketIle(result.get(0));
-                            Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
-                            int sinyalGonderilecekID = db.idGetirEtiketIle(result.get(0));
+                            Log.v("Token:","tokens[0]:" + tokens[0].trim() + "$");
+                            int sinyalGonderilecekID = db.bolgeIdGetirEsyaAdiIle(tokens[0].trim());
                             Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
+
+                            String sinyalGonderilecekIP = db.getBolge(sinyalGonderilecekID).get_ipAdresi();
+                            Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
+
                             SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID);
                         }catch(Exception e){
                             e.printStackTrace();
                         }
                     }
                 }
+                break;
+            case 20:
+                if(resultCode==RESULT_OK && data != null){
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    txvResult.setText(result.get(0));
 
+                    String str = result.get(0);
+                    String delims = "ekle+";
+                    String[] tokens = str.split(delims);
 
+                    int eklenecekID = db.idGetirEtiketIle(tokens[0].trim());
+                    db.addEsya(new Esya(eklenecekID,tokens[1].trim()));
+                    esyalariGetir();
+
+                }
                 break;
         }
     }// onActivityResult sonu
@@ -205,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-
                 }
 
                 @Override
@@ -213,8 +239,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.v("Sinyal","Sinyal Gonderilemedi");
                 }
             });
-
-
 
         }catch(Exception e){
             Log.v("RetrofitHata","Sinyal Gonderilemedi");

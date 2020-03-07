@@ -1,23 +1,26 @@
 package com.melihcelenk.seslekontrol;
 
 public class SinyalGonderData {
-    public int getId() {
+
+    private String id;
+    private String durum;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getDurum() {
+    public String getDurum() {
         return durum;
     }
 
-    public void setDurum(int durum) {
+    public void setDurum(String durum) {
         this.durum = durum;
     }
 
-    private int id;
-    private int durum;
+
 
 }

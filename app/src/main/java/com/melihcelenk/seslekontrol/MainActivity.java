@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     } // onCreate sonu
 
     public void getSpeechInput(View view){
+        /*TODO: hızlı sonlanma sorununu çöz, bir token'a göre sonlanmayı araştır*/
+        /* TODO: Hata kontrolleri ve ara yüzler, daha sonra eşyayı anahtar kelimelerle ekleme yapılacak. */
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void SinyalGonder(String ipAdresi, final int id){
-        final Boolean[] arananMi = new Boolean[1];
+
         String url="http://" + ipAdresi;
         Gson gson = new GsonBuilder()
                 .setLenient()
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         try {
             LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
-            Call<SinyalGonderData> call = ledControllerIService.getSinyalGonderData(id,23);
+            Call<SinyalGonderData> call = ledControllerIService.getSinyalGonderData(String.valueOf(id),String.valueOf(23));
             call.enqueue(new Callback<SinyalGonderData>() {
                 @Override
                 public void onResponse(Call<SinyalGonderData> call, Response<SinyalGonderData> response) {
@@ -218,13 +220,13 @@ public class MainActivity extends AppCompatActivity {
                         if(response.isSuccessful()){
                             Log.v("sinyalResponse","Cevap başarılı");
                             SinyalGonderData sinyalGonderData = response.body();
-                            if(sinyalGonderData.getId() == id && sinyalGonderData.getDurum() == 23) {
+                            if(sinyalGonderData.getId() == String.valueOf(id) && sinyalGonderData.getDurum() == String.valueOf(23)) {
                                 Toast.makeText(getApplicationContext(), "Sinyal Gonderildi.", Toast.LENGTH_SHORT).show();
                                 Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
                             }
                         }
                         else {
-                            Toast.makeText(getApplicationContext(), "Sinyal Gönderilemedi", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
                             Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
                         }
                     }catch(JsonIOException e){
@@ -237,6 +239,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<SinyalGonderData> call, Throwable t) {
                     Log.v("Sinyal","Sinyal Gonderilemedi");
+                    Toast.makeText(getApplicationContext(), "Cihazdan cevap gelmedi.", Toast.LENGTH_LONG).show();
+                    /*TODO Neden Response Almadığnıa Bak */
                 }
             });
 

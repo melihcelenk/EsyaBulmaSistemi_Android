@@ -19,5 +19,5 @@ public interface LedControllerI {
     Call<KonfigurasyonData> getKonfigurasyonData(@Query("setNodeId") String nodeId);
 
     @GET("sinyalGonder")
-    Call<SinyalGonderData> getSinyalGonderData(@Query("id") int id,@Query("durum") int durum);
+    Call<SinyalGonderData> getSinyalGonderData(@Query("id") String id,@Query("durum") String durum);
 }

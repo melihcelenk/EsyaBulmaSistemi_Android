@@ -15,13 +15,12 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-
-import org.w3c.dom.Node;
+import com.stealthcopter.networktools.SubnetDevices;
+import com.stealthcopter.networktools.subnet.Device;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,12 +39,15 @@ public class MainActivity extends AppCompatActivity {
 
         txvResult = findViewById(R.id.textView);
         db = new DatabaseHandler(this);
-
+        /* TODO: Açılışta başka bir thread'de bütün cihazlara istek gönderip birinden cevap gelmeyince IPBulveGuncelle çalıştırılsın.*/
+        IPBulveGuncelle();
     } // onCreate sonu
 
     public void getSpeechInput(View view){
         /*TODO: hızlı sonlanma sorununu çöz, bir token'a göre sonlanmayı araştır*/
-        /* TODO: Hata kontrolleri ve ara yüzler, daha sonra eşyayı anahtar kelimelerle ekleme yapılacak. */
+        /* TODO: Hata kontrolleri ve ara yüzler, daha sonra eşyayı anahtar kelimelerle ekleme yapılacak:
+        *  Eşyayı ara, eğer birden fazla bulunursa gelen değerler içinde arama yap, tekrar DB'ye bağlanma  */
+
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
@@ -61,18 +63,6 @@ public class MainActivity extends AppCompatActivity {
     public void kurulum(View view){
         Intent intent = new Intent(getApplicationContext(),KurulumActivity.class);
         startActivity(intent);
-    }
-    public void esyaEkle(View view){
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-
-        if(intent.resolveActivity(getPackageManager()) != null){
-            startActivityForResult(intent, 20);
-        }
-        else{
-            Toast.makeText(this,"Konusma Tanima Desteklenmiyor", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void esyalariGetir(){
@@ -91,90 +81,49 @@ public class MainActivity extends AppCompatActivity {
             case 10:
                 if(resultCode==RESULT_OK && data != null){
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-
                     txvResult.setText(result.get(0));
 
-                    String str = result.get(0);
-                    String delims = "nerede+";
-                    String[] tokens = str.split(delims);
-
-                    if(result.get(0).equals("kimsin")) me();
-                    else{
+                    if(result.get(0).contains("nerede"))
+                    {
+                        String str = result.get(0);
+                        String delims = "nerede+";
+                        String[] tokens = str.split(delims);
                         try{
                             Log.v("SinyalGonder","Gonderilecek");
                             Log.v("Token:","tokens[0]:" + tokens[0].trim() + "$");
                             int sinyalGonderilecekID = db.bolgeIdGetirEsyaAdiIle(tokens[0].trim());
                             Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
-
                             String sinyalGonderilecekIP = db.getBolge(sinyalGonderilecekID).get_ipAdresi();
                             Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
-
                             SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID);
                         }catch(Exception e){
                             e.printStackTrace();
                         }
                     }
+                    else if(result.get(0).contains("ekle")){
+                        String str = result.get(0);
+                        String delims = "ekle+";
+                        String[] tokens = str.split(delims);
+                        try{
+                            int eklenecekID = db.idGetirEtiketIle(tokens[0].trim());
+                            db.addEsya(new Esya(eklenecekID,tokens[1].trim()));
+                            esyalariGetir();
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    else if(result.get(0).contains("listele")){
+                        // TODO: eşyaları listele recyclerview için adaptör tasarla
+                    }
                 }
                 break;
-            case 20:
-                if(resultCode==RESULT_OK && data != null){
-                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    txvResult.setText(result.get(0));
 
-                    String str = result.get(0);
-                    String delims = "ekle+";
-                    String[] tokens = str.split(delims);
-
-                    int eklenecekID = db.idGetirEtiketIle(tokens[0].trim());
-                    db.addEsya(new Esya(eklenecekID,tokens[1].trim()));
-                    esyalariGetir();
-
-                }
-                break;
         }
     }// onActivityResult sonu
 
-    public void ledYak(){
-        String url="http://192.168.0.103";
-        retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .build();
-        LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-        ledContrrolerIService.openLed().enqueue(new Callback<ResponseBody>() {
 
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println("Basarili " + response.toString());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println("Basarisiz " + t.toString());
-            }
-        });
-    }
-    public void ledKapa(){
-        String url="http://192.168.0.103";
-        retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .build();
-        LedControllerI ledContrrolerIService= retrofit.create(LedControllerI.class);
-        ledContrrolerIService.closeLed().enqueue(new Callback<ResponseBody>() {
-
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println("Basarili" + response.toString());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println("Basarisiz " + t.toString());
-            }
-        });
-    }
-
-    public void me(){
-        String url="http://192.168.0.103";
+    public void me(String ipAdresi){
+        String url="http://"+ipAdresi;
 
         Gson gson = new GsonBuilder()
                 .setLenient()
@@ -238,9 +187,16 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<SinyalGonderData> call, Throwable t) {
-                    Log.v("Sinyal","Sinyal Gonderilemedi");
-                    Toast.makeText(getApplicationContext(), "Cihazdan cevap gelmedi.", Toast.LENGTH_LONG).show();
-                    /*TODO Neden Response Almadığnıa Bak */
+                    Log.v("SinyalGonder","Cihazdan cevap gelmedi");
+                    Log.v("SinyalBasarisiz","IP'ler güncellenecek...");
+                    /*TODO: IPBulveGuncelle'yi Thread içine al*/
+                    try{
+                        IPBulveGuncelle();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(getApplicationContext(), "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
+                    /*TODO: IP'ler güncellenene kadar butonları kilitle */
                 }
             });
 
@@ -248,5 +204,90 @@ public class MainActivity extends AppCompatActivity {
             Log.v("RetrofitHata","Sinyal Gonderilemedi");
             e.printStackTrace();
         }
-    }
+    }//-----------------------------------SinyalGonder sonu---------------------------------------------------
+    private void IPBulveGuncelle() {
+        final ArrayList<bulunanCihaz> bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
+        Log.v("IPBul","Cihazlar taranıyor...");
+
+        final long startTimeMillis = System.currentTimeMillis();
+        try{
+            SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
+                @Override
+                public void onDeviceFound(Device device) {
+                    NodeData n;
+                    n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
+
+                    if (n!=null){
+                        try {
+                            //IP'ler diziye ekleniyor
+                            Log.v("onDeviceFound","n null değil, cihaz diziye eklenecek...");
+                            Log.v("onDeviceFound","IP:"+n.getIp()+" MAC:"+n.getMacAddress());
+                            final NodeData finalN = n;
+                            //runOnUiThread(new Runnable() {
+                            //    @Override
+                            //    public void run() {
+                                    bulunanCihazlarArray.add(new bulunanCihaz(finalN.getMacAddress(), finalN.getIp()));
+                            //    }
+                            //});
+                        }
+                        catch (Exception e) {
+                            Log.e("Diziekle",e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                @Override
+                public void onFinished(ArrayList<Device> devicesFound) {
+                    float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
+                    Log.v("IpBulOnFinished","Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size() + " Uyumlu cihaz sayısı:" + bulunanCihazlarArray.size());
+                    for (int i=0;i<bulunanCihazlarArray.size();i++) {
+                        Log.v("IpDegistiriliyor","Mac:"+bulunanCihazlarArray.get(i).getMac()+" eski IP:" + db.ipGetir(bulunanCihazlarArray.get(i).getMac()) + " yeniIP:"+bulunanCihazlarArray.get(i).getIp());
+
+                        try{
+                            db.ipDegistir(bulunanCihazlarArray.get(i).getMac(),bulunanCihazlarArray.get(i).getIp());
+                            Log.v("IpDegistirildi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
+                        }catch(Exception e){
+                            try{
+                                Log.v("IpDegistirilemedi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
+                            }
+                            catch(Exception e1){
+                                e1.printStackTrace();
+                                Log.e("IpBulOnFinished","Veritabanına erişilemedi veya arraya ulaşılamadı.");
+                            }
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            });
+        }catch(Exception e){
+            Log.e("IPBulHata",e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }//--------IPBul sonu-----------------------------------------------------------------------
+
+    public NodeData arananCihazsaGetir(String ipAdresi){
+        final Boolean[] arananMi = new Boolean[1];
+        String url="http://" + ipAdresi;
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        try {
+            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
+            NodeData nodeData = ledControllerIService.getNodeData().execute().body();
+            Log.v("Node", nodeData.getIp());
+            return nodeData;
+
+        }catch(Exception e){
+            Log.v("RetrofitHata",e.getLocalizedMessage());
+            e.printStackTrace();
+            return null;
+
+        }
+    }//----------------------arananCihazsaGetir sonu------------------------------
+
 }

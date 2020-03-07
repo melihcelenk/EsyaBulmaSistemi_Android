@@ -143,7 +143,6 @@ public class KurulumActivity extends AppCompatActivity {
     }
 
     private void IPBul() {
-
         sonucTextveButonDegistir("Taranıyor...",false);
         bulunanCihazlarArrayTemizle();
         final long startTimeMillis = System.currentTimeMillis();
@@ -151,8 +150,14 @@ public class KurulumActivity extends AppCompatActivity {
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
                 @Override
                 public void onDeviceFound(Device device) {
-                    NodeData n;
-                    n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
+                    NodeData n = null;
+                    try{
+                        n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
+
 
                     if (n!=null){
                         try {
@@ -163,10 +168,7 @@ public class KurulumActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-
                 }
-
-
                 @Override
                 public void onFinished(ArrayList<Device> devicesFound) {
                     float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
@@ -178,8 +180,7 @@ public class KurulumActivity extends AppCompatActivity {
             Log.e("IPBulHata",e.getLocalizedMessage());
             e.printStackTrace();
         }
-
-    }
+    }//--------IPBul sonu-----------------------------------------------------------------------
 
     public NodeData arananCihazsaGetir(String ipAdresi){
         final Boolean[] arananMi = new Boolean[1];
@@ -196,15 +197,12 @@ public class KurulumActivity extends AppCompatActivity {
             NodeData nodeData = ledControllerIService.getNodeData().execute().body();
             Log.v("Node", nodeData.getIp());
             return nodeData;
-
-        }catch(Exception e){
+        }
+        catch(Exception e){
             Log.v("RetrofitHata",e.getLocalizedMessage());
             e.printStackTrace();
             return null;
-
         }
-
-    }
-
+    }//----------------------arananCihazsaGetir sonu------------------------------
 
 }

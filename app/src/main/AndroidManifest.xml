@@ -15,11 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".KonfigureEtActivity"></activity>
-        <activity android:name=".KayitliBolgelerActivity" />
-        <activity android:name=".PinBelirleActivity" />
-        <activity android:name=".KurulumActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activityler.esyalarilisteleactivity.EsyalariListeleActivity"></activity>
+        <activity android:name=".activityler.KonfigureEtActivity" />
+        <activity android:name=".activityler.KayitliBolgelerActivity" />
+        <activity android:name=".activityler.PinBelirleActivity" />
+        <activity android:name=".activityler.kurulumactivity.KurulumActivity" />
+        <activity android:name=".activityler.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

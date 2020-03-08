@@ -1,4 +1,4 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.activityler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +14,11 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.melihcelenk.seslekontrol.DatabaseHandler;
+import com.melihcelenk.seslekontrol.LedControllerI;
+import com.melihcelenk.seslekontrol.R;
+import com.melihcelenk.seslekontrol.modeller.Bolge;
+import com.melihcelenk.seslekontrol.modeller.KonfigurasyonData;
 
 import java.util.ArrayList;
 

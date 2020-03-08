@@ -1,4 +1,6 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.modeller;
+
+import com.melihcelenk.seslekontrol.LedControllerI;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

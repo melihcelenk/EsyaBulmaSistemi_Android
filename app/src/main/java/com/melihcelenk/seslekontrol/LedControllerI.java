@@ -1,5 +1,9 @@
 package com.melihcelenk.seslekontrol;
 
+import com.melihcelenk.seslekontrol.modeller.KonfigurasyonData;
+import com.melihcelenk.seslekontrol.modeller.NodeData;
+import com.melihcelenk.seslekontrol.modeller.SinyalGonderData;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -19,5 +23,5 @@ public interface LedControllerI {
     Call<KonfigurasyonData> getKonfigurasyonData(@Query("setNodeId") String nodeId);
 
     @GET("sinyalGonder")
-    Call<SinyalGonderData> getSinyalGonderData(@Query("id") String id,@Query("durum") String durum);
+    Call<SinyalGonderData> getSinyalGonderData(@Query("id") String id, @Query("durum") String durum);
 }

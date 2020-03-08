@@ -1,4 +1,4 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.activityler.kurulumactivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,19 +13,19 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
+import com.melihcelenk.seslekontrol.DatabaseHandler;
+import com.melihcelenk.seslekontrol.LedControllerI;
+import com.melihcelenk.seslekontrol.R;
+import com.melihcelenk.seslekontrol.activityler.KonfigureEtActivity;
+import com.melihcelenk.seslekontrol.modeller.bulunanCihaz;
+import com.melihcelenk.seslekontrol.modeller.NodeData;
 import com.stealthcopter.networktools.IPTools;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
 
-import org.w3c.dom.Node;
-
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -64,7 +64,7 @@ public class KurulumActivity extends AppCompatActivity {
             public void onItemClick(int position) {
                 bulunanCihaz bc = bulunanCihazlarArray.get(position);
                 //mAdapter.notifyDataSetChanged();
-                Intent intent = new Intent(getApplicationContext(),KonfigureEtActivity.class);
+                Intent intent = new Intent(getApplicationContext(), KonfigureEtActivity.class);
                 intent.putExtra("ipAdresi",bc.getIp());
                 intent.putExtra("macAdresi",bc.getMac());
                 startActivity(intent);

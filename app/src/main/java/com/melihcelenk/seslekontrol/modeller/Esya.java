@@ -1,4 +1,4 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.modeller;
 
 public class Esya {
     private int _esyaId;

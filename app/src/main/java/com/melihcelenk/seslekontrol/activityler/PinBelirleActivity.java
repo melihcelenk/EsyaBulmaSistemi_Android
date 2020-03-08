@@ -1,4 +1,4 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.activityler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.melihcelenk.seslekontrol.R;
 
 public class PinBelirleActivity extends AppCompatActivity {
 

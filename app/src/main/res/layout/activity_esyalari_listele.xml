@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activityler.kurulumactivity.KurulumActivity">
+    tools:context=".activityler.esyalarilisteleactivity.EsyalariListeleActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,20 +15,13 @@
             android:id="@+id/sonucText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cihazları ağa bağladıktan sonra aşağıdaki butona basınız.\n" />
-
-        <Button
-            android:id="@+id/taraBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tara" />
+            android:text="Buraya eşya seçme koyulacak.\n" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/cihazlarRV"
+            android:id="@+id/esyalarRV"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical" />
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

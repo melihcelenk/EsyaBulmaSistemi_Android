@@ -1,9 +1,13 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.activityler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+
+import com.melihcelenk.seslekontrol.modeller.Bolge;
+import com.melihcelenk.seslekontrol.DatabaseHandler;
+import com.melihcelenk.seslekontrol.R;
 
 import java.util.ArrayList;
 

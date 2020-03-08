@@ -1,11 +1,10 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.activityler;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +15,16 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import com.stealthcopter.networktools.SubnetDevices;
-import com.stealthcopter.networktools.subnet.Device;
+import com.melihcelenk.seslekontrol.DatabaseHandler;
+import com.melihcelenk.seslekontrol.Haberlesme;
+import com.melihcelenk.seslekontrol.IPArkaplanKontrol;
+import com.melihcelenk.seslekontrol.LedControllerI;
+import com.melihcelenk.seslekontrol.R;
+import com.melihcelenk.seslekontrol.activityler.esyalarilisteleactivity.EsyalariListeleActivity;
+import com.melihcelenk.seslekontrol.activityler.kurulumactivity.KurulumActivity;
+import com.melihcelenk.seslekontrol.modeller.Esya;
+import com.melihcelenk.seslekontrol.modeller.NodeData;
+import com.melihcelenk.seslekontrol.modeller.SinyalGonderData;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -65,11 +72,15 @@ public class MainActivity extends AppCompatActivity {
 
     }// getSpeechInput sonu
     public void kurulum(View view){
-        Intent intent = new Intent(getApplicationContext(),KurulumActivity.class);
+        Intent intent = new Intent(getApplicationContext(), KurulumActivity.class);
+        startActivity(intent);
+    }
+    public void esyalariListeleActivityGit(View view){
+        Intent intent = new Intent(getApplicationContext(), EsyalariListeleActivity.class);
         startActivity(intent);
     }
 
-    public void esyalariGetir(){
+    public void esyalariLogla(){
         ArrayList<Esya> butunEsyalar = (ArrayList<Esya>) db.getButunEsyalar();
         for (Esya cn : butunEsyalar) {
             String log = "esyaId: " + cn.get_esyaId() + "\tbolgeId: " + cn.get_bolgeId() + "\tesyaAdi: " + cn.get_esyaAdi();
@@ -99,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
                             String sinyalGonderilecekIP = db.getBolge(sinyalGonderilecekID).get_ipAdresi();
                             Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
-                            SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID);
+                            Haberlesme.SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID,getApplicationContext());
                         }catch(Exception e){
                             e.printStackTrace();
                         }
@@ -111,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         try{
                             int eklenecekID = db.idGetirEtiketIle(tokens[0].trim());
                             db.addEsya(new Esya(eklenecekID,tokens[1].trim()));
-                            esyalariGetir();
+                            esyalariLogla();
                         }catch(Exception e){
                             e.printStackTrace();
                         }
@@ -152,9 +163,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
-    public void SinyalGonder(String ipAdresi, final int id){
+    /*TODO: Silinecek */
+    public void ASinyalGonder(String ipAdresi, final int id){
 
         String url="http://" + ipAdresi;
         Gson gson = new GsonBuilder()

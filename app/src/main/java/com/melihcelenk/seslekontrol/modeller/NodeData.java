@@ -1,4 +1,4 @@
-package com.melihcelenk.seslekontrol;
+package com.melihcelenk.seslekontrol.modeller;
 
 public class NodeData {
     private int nodeId;

@@ -1,7 +1,6 @@
 package com.melihcelenk.seslekontrol;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -9,15 +8,14 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.stealthcopter.networktools.ARPInfo;
+import com.melihcelenk.seslekontrol.modeller.Bolge;
+import com.melihcelenk.seslekontrol.modeller.NodeData;
+import com.melihcelenk.seslekontrol.modeller.bulunanCihaz;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
 
 import java.util.ArrayList;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -25,7 +23,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     ProgressBar progressBar;
     DatabaseHandler db;
     private Context context;
-    IPArkaplanKontrol(Context context, ProgressBar progressBar, DatabaseHandler db) {
+    public IPArkaplanKontrol(Context context, ProgressBar progressBar, DatabaseHandler db) {
         this.context= context;
         this.progressBar = progressBar;
         this.db = db;

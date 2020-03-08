@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.melihcelenk.seslekontrol.modeller.Bolge;
+import com.melihcelenk.seslekontrol.modeller.Esya;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +85,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return ID;
     }
 
-    int ekleVeyaDegistirBolge(Bolge bolge){
+    public int ekleVeyaDegistirBolge(Bolge bolge){
         SQLiteDatabase db = this.getWritableDatabase();
 
         String EKLE_VEYA_DEGISTIR_BOLGE = "insert or replace into bolgeler(id,etiket,mac_adresi,ip_adresi) " +
@@ -98,7 +101,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return sonGuncID;
     }
 
-    int ipDegistir(String mac, String ip){
+    public int ipDegistir(String mac, String ip){
         SQLiteDatabase db = this.getWritableDatabase();
         String IP_DEGISTIR = "update bolgeler set ip_adresi = '" + ip + "' WHERE mac_adresi='" + mac + "'";
         db.execSQL(IP_DEGISTIR);
@@ -107,7 +110,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return sonGuncID;
     }
 
-    String etiketGetir(String macAdresi){
+    public String etiketGetir(String macAdresi){
         SQLiteDatabase db = this.getReadableDatabase();
         String ETIKETGETIR = "select etiket from bolgeler where mac_adresi = \"" + macAdresi + "\"";
         Cursor cursor = db.rawQuery(ETIKETGETIR, null);
@@ -118,8 +121,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return etiket;
     }
+    public String etiketGetirBolgeIdIle(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String ETIKETGETIR = "select etiket from bolgeler where "+KEY_ID+" = \"" + id + "\"";
+        Cursor cursor = db.rawQuery(ETIKETGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String etiket = cursor.getString(0);
+        cursor.close();
+        db.close();
+        return etiket;
+    }
 
-    String idGetir(String macAdresi){
+    public String idGetir(String macAdresi){
         SQLiteDatabase db = this.getReadableDatabase();
         String IDGETIR = "select id from bolgeler where mac_adresi = \"" + macAdresi + "\"";
         Cursor cursor = db.rawQuery(IDGETIR, null);
@@ -131,7 +145,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return id;
     }
 
-    String ipGetir(String macAdresi){
+    public String ipGetir(String macAdresi){
         SQLiteDatabase db = this.getReadableDatabase();
         String IPGETIR = "select ip_adresi from bolgeler where mac_adresi = \"" + macAdresi + "\"";
         Cursor cursor = db.rawQuery(IPGETIR, null);
@@ -143,7 +157,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return ip;
     }
 
-    String ipGetirEtiketIle(String etiket){
+    public String ipGetirBolgeIdIle(int bolgeId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String IPGETIR = "select ip_adresi from bolgeler where "+ KEY_BOLGE_ID + "= \"" + bolgeId + "\"";
+        Cursor cursor = db.rawQuery(IPGETIR, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        String ip = cursor.getString(0);
+        cursor.close();
+        db.close();
+        return ip;
+    }
+
+    public String ipGetirEtiketIle(String etiket){
         SQLiteDatabase db = this.getReadableDatabase();
         String IPGETIR = "select ip_adresi from bolgeler where etiket = \"" + etiket + "\" COLLATE NOCASE";
         Cursor cursor = db.rawQuery(IPGETIR, null);
@@ -154,7 +180,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return ip;
     }
-    int idGetirEtiketIle(String etiket){
+    public int idGetirEtiketIle(String etiket){
         SQLiteDatabase db = this.getReadableDatabase();
         String IDGETIR = "select id from bolgeler where etiket = \"" + etiket + "\" COLLATE NOCASE";
         Cursor cursor = db.rawQuery(IDGETIR, null);
@@ -168,7 +194,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     // code to get the single contact
-    Bolge getBolge(int id) {
+    public Bolge getBolge(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_BOLGELER, new String[] { KEY_ID,
@@ -261,7 +287,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return esyaList;
     }
-    long addEsya(Esya esya) {
+    public long addEsya(Esya esya) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_ESYA_ADI, esya.get_esyaAdi());
@@ -271,7 +297,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return id;
     }
 
-    int bolgeIdGetirEsyaAdiIle(String esyaAdi){
+    public int bolgeIdGetirEsyaAdiIle(String esyaAdi){
         SQLiteDatabase db = this.getReadableDatabase();
         //String BOLGEIDGETIRESYAADIILE = "select "+ KEY_BOLGE_ID +" from "+TABLE_ESYALAR+" where "+KEY_ESYA_ADI+" = \"" + esyaAdi + "\" COLLATE NOCASE";
         String BOLGEIDGETIRESYAADIILE = "select id from esyalar where esyaAdi = \"" + esyaAdi + "\" COLLATE NOCASE";

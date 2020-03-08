@@ -9,6 +9,7 @@ import android.provider.ContactsContract;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,15 +33,18 @@ public class MainActivity extends AppCompatActivity {
     TextView txvResult;
     Retrofit retrofit;
     DatabaseHandler db;
+    ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = findViewById(R.id.progressBar);
         txvResult = findViewById(R.id.textView);
         db = new DatabaseHandler(this);
         /* TODO: Açılışta başka bir thread'de bütün cihazlara istek gönderip birinden cevap gelmeyince IPBulveGuncelle çalıştırılsın.*/
-        IPBulveGuncelle();
+        new IPArkaplanKontrol(MainActivity.this,progressBar,db).execute((Void) null);
+
     } // onCreate sonu
 
     public void getSpeechInput(View view){
@@ -148,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+
     public void SinyalGonder(String ipAdresi, final int id){
 
         String url="http://" + ipAdresi;
@@ -191,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.v("SinyalBasarisiz","IP'ler güncellenecek...");
                     /*TODO: IPBulveGuncelle'yi Thread içine al*/
                     try{
-                        IPBulveGuncelle();
+                        //IPBulveGuncelle();
                     }catch(Exception e){
                         e.printStackTrace();
                     }
@@ -205,89 +211,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }//-----------------------------------SinyalGonder sonu---------------------------------------------------
-    private void IPBulveGuncelle() {
-        final ArrayList<bulunanCihaz> bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
-        Log.v("IPBul","Cihazlar taranıyor...");
 
-        final long startTimeMillis = System.currentTimeMillis();
-        try{
-            SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
-                @Override
-                public void onDeviceFound(Device device) {
-                    NodeData n;
-                    n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
 
-                    if (n!=null){
-                        try {
-                            //IP'ler diziye ekleniyor
-                            Log.v("onDeviceFound","n null değil, cihaz diziye eklenecek...");
-                            Log.v("onDeviceFound","IP:"+n.getIp()+" MAC:"+n.getMacAddress());
-                            final NodeData finalN = n;
-                            //runOnUiThread(new Runnable() {
-                            //    @Override
-                            //    public void run() {
-                                    bulunanCihazlarArray.add(new bulunanCihaz(finalN.getMacAddress(), finalN.getIp()));
-                            //    }
-                            //});
-                        }
-                        catch (Exception e) {
-                            Log.e("Diziekle",e.getMessage());
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                @Override
-                public void onFinished(ArrayList<Device> devicesFound) {
-                    float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
-                    Log.v("IpBulOnFinished","Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size() + " Uyumlu cihaz sayısı:" + bulunanCihazlarArray.size());
-                    for (int i=0;i<bulunanCihazlarArray.size();i++) {
-                        Log.v("IpDegistiriliyor","Mac:"+bulunanCihazlarArray.get(i).getMac()+" eski IP:" + db.ipGetir(bulunanCihazlarArray.get(i).getMac()) + " yeniIP:"+bulunanCihazlarArray.get(i).getIp());
 
-                        try{
-                            db.ipDegistir(bulunanCihazlarArray.get(i).getMac(),bulunanCihazlarArray.get(i).getIp());
-                            Log.v("IpDegistirildi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
-                        }catch(Exception e){
-                            try{
-                                Log.v("IpDegistirilemedi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
-                            }
-                            catch(Exception e1){
-                                e1.printStackTrace();
-                                Log.e("IpBulOnFinished","Veritabanına erişilemedi veya arraya ulaşılamadı.");
-                            }
-                            e.printStackTrace();
-                        }
-                    }
-
-                }
-            });
-        }catch(Exception e){
-            Log.e("IPBulHata",e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-    }//--------IPBul sonu-----------------------------------------------------------------------
-
-    public NodeData arananCihazsaGetir(String ipAdresi){
-        final Boolean[] arananMi = new Boolean[1];
-        String url="http://" + ipAdresi;
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        try {
-            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
-            NodeData nodeData = ledControllerIService.getNodeData().execute().body();
-            Log.v("Node", nodeData.getIp());
-            return nodeData;
-
-        }catch(Exception e){
-            Log.v("RetrofitHata",e.getLocalizedMessage());
-            e.printStackTrace();
-            return null;
-
-        }
-    }//----------------------arananCihazsaGetir sonu------------------------------
 
 }

@@ -145,7 +145,7 @@ public class KurulumActivity extends AppCompatActivity {
     private void IPBul() {
         sonucTextveButonDegistir("Taranıyor...",false);
         bulunanCihazlarArrayTemizle();
-        final long startTimeMillis = System.currentTimeMillis();
+        //final long startTimeMillis = System.currentTimeMillis();
         try{
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
                 @Override
@@ -171,7 +171,7 @@ public class KurulumActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onFinished(ArrayList<Device> devicesFound) {
-                    float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
+                    //float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
                     sonucTextveButonDegistir("Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size(),true);
                     //sonucTextveButonDegistir("Finished "+timeTaken+" s");
                 }

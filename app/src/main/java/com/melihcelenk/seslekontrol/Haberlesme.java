@@ -38,7 +38,7 @@ public class Haberlesme {
                 @Override
                 public void onResponse(Call<SinyalGonderData> call, Response<SinyalGonderData> response) {
                     try{
-                        Log.v("sinyalResponse","Sinyalden cevap geldi. (IP:)"+ipAdresi);
+                        Log.v("sinyalResponse","Sinyalden cevap geldi. (IP:"+ipAdresi+")");
                         if(response.isSuccessful()){
                             Log.v("sinyalResponse","Cevap başarılı");
                             SinyalGonderData sinyalGonderData = response.body();
@@ -47,8 +47,8 @@ public class Haberlesme {
                                 Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
                             }
                         }
-                        else {
-                            /*TODO: Bu kısım denenmedi.*/
+                        else { // IP, bu projeye ait farklı bir cihaza aitse bu durum çalışır
+                            /*TODO: Bu kısım denenmedi. Farklı IP'deki bir cihaz durumu*/
                             try{
                                 new IPArkaplanKontrol(context).execute((Void) null);
                             }catch(Exception e){
@@ -62,7 +62,6 @@ public class Haberlesme {
                         Log.v("sinyalResponse","Sinyalden gelen cevapta hata oluştu");
                         e.printStackTrace();
                     }
-
                 }
 
                 @Override
@@ -71,7 +70,6 @@ public class Haberlesme {
                     Log.v("SinyalGonder","Cihazdan cevap gelmedi");
                     Log.v("SinyalBasarisiz","IP'ler güncellenecek...");
                     Toast.makeText(context, "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
-                    /*TODO: Bu kısım denenmedi.*/
                     try{
                         new IPArkaplanKontrol(context).execute((Void) null);
                     }catch(Exception e){

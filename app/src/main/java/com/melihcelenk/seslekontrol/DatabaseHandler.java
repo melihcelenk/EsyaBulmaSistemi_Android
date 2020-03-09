@@ -208,6 +208,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return bolge;
     }
+    public Bolge getBolgeMacIle(String mac) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_BOLGELER, new String[] { KEY_ID,
+                        KEY_ETIKET, KEY_MAC_ADRESI, KEY_IP_ADRESI }, KEY_MAC_ADRESI + "=?",
+                new String[] { mac }, null, null, null, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        Bolge bolge = new Bolge(Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1), cursor.getString(2),cursor.getString(3));
+        db.close();
+        return bolge;
+    }
 
     public List<Bolge> getButunBolgeler() {
         List<Bolge> bolgeList = new ArrayList<Bolge>();

@@ -13,9 +13,7 @@ import com.melihcelenk.seslekontrol.modeller.NodeData;
 import com.melihcelenk.seslekontrol.modeller.bulunanCihaz;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
-
 import java.util.ArrayList;
-
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -23,6 +21,10 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     ProgressBar progressBar;
     DatabaseHandler db;
     private Context context;
+    private int progressDurum;
+    private int progressDurumMax;
+    ArrayList<Bolge> guncellenemeyenBolgeler;
+
     public IPArkaplanKontrol(Context context, ProgressBar progressBar, DatabaseHandler db) {
         this.context= context;
         this.progressBar = progressBar;
@@ -40,10 +42,17 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        guncellenemeyenBolgeler = new ArrayList<Bolge>();
+        progressDurum=0;
+        progressDurumMax=10;
         try {
-            progressBar.setVisibility(View.VISIBLE);
-            progressBar.setMax(100);
-            progressBar.setProgress(10);
+            if(progressBar!=null){
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setMax(progressDurumMax);
+                progressBar.setProgress(progressDurum);
+            }
+
+
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -70,10 +79,20 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     @Override
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
+        Toast.makeText(context, "IP değiştirme tamamlandı.???", Toast.LENGTH_SHORT).show();
+        // TODO: Buton kilitleri burada açılacak
         try {
-            progressBar.setVisibility(View.INVISIBLE);
+            if(progressBar!=null){
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
         }catch(Exception e){
             e.printStackTrace();
+        }
+        //TODO: Burası BaglantiKontrol sonlanmadan çalışıyor. onPostExecute BaglantiKontrol bittiğinde çalışmalı
+        for(Bolge b : guncellenemeyenBolgeler){
+                Toast.makeText(context, "Cihaza ulaşılamadı:"+b.get_etiket(), Toast.LENGTH_SHORT).show();
+                Log.v("IPNull","IP:null"+" MAC:"+b.get_macAdresi());
         }
     }
 
@@ -82,7 +101,16 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         super.onProgressUpdate(values);
         Integer currentProgress = values[0];
         try{
-            progressBar.setProgress(currentProgress);
+            if(progressBar!=null){
+                if(progressDurum/(float)progressDurumMax>0.70){
+                    progressDurumMax*=2;
+                    progressBar.setMax(progressDurumMax);
+
+                }
+                progressBar.setProgress(currentProgress);
+                Log.v("Progress","ProgressDurum:"+progressDurum+" Max:"+progressDurumMax);
+            }
+
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -99,7 +127,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         final int[] yanlisIPliCihazSayisi = new int[1];
         yanlisIPliCihazSayisi[0] = 0;
         for (final Bolge bolge : db.getButunBolgeler()) {
-
+            publishProgress(++progressDurum);
             String url="http://"+bolge.get_ipAdresi();;
             Log.v("BaglantiKontrol","Kontrol ediliyor: "+ url);
             Gson gson = new GsonBuilder()
@@ -119,13 +147,15 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                 }
                 else {
                     yanlisIPliCihazSayisi[0]++;
+                    guncellenemeyenBolgeler.add(bolge);
                     Log.v("BaglantiKontrol", "Bir hata var. Cihazdaki IP: "+nodeData.getIp()+" Eski IP:"+bolge.get_ipAdresi());
                 }
 
 
             }catch(Exception e){
-                Log.v("YanlisIP", "IP'ye ulaşılamadı:"+bolge.get_ipAdresi()+ " güncellenecek.");
+                Log.v("YanlisIP", "Ulaşılamayan IP: "+bolge.get_ipAdresi()+ " , MAC adresi: "+ bolge.get_macAdresi());
                 yanlisIPliCihazSayisi[0]++;
+                guncellenemeyenBolgeler.add(bolge);
                 Log.v("BaglantiKontrol",e.getLocalizedMessage());
                 e.printStackTrace();
             }
@@ -153,6 +183,8 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
                 @Override
                 public void onDeviceFound(Device device) {
+
+                    publishProgress(++progressDurum);
                     NodeData n;
                     n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
 
@@ -177,7 +209,6 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                 }
                 @Override
                 public void onFinished(ArrayList<Device> devicesFound) {
-                    float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
                     Log.v("IpBulOnFinished","Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size() + " Uyumlu cihaz sayısı:" + bulunanCihazlarArray.size());
                     for (int i=0;i<bulunanCihazlarArray.size();i++) {
                         Log.v("IpDegistiriliyor","Mac:"+bulunanCihazlarArray.get(i).getMac()+" eski IP:" + db.ipGetir(bulunanCihazlarArray.get(i).getMac()) + " yeniIP:"+bulunanCihazlarArray.get(i).getIp());
@@ -185,9 +216,11 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                         try{
                             db.ipDegistir(bulunanCihazlarArray.get(i).getMac(),bulunanCihazlarArray.get(i).getIp());
                             Log.v("IpDegistirildi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
+                            guncellenemeyenBolgeler.remove(db.getBolgeMacIle(bulunanCihazlarArray.get(i).getMac()));
+                            Log.v("getBolgeMacIle","guncellenemeyenBolgeler.remove çalıştı.");
                         }catch(Exception e){
                             try{
-                                Log.v("IpDegistirilemedi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
+                                Log.v("IpDegistirilemedi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" IP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
                             }
                             catch(Exception e1){
                                 e1.printStackTrace();
@@ -227,6 +260,9 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
 
         }
     }//----------------------arananCihazsaGetir sonu------------------------------
+
+
+
 }
 
 

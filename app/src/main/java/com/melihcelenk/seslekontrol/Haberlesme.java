@@ -2,11 +2,13 @@ package com.melihcelenk.seslekontrol;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.melihcelenk.seslekontrol.activityler.MainActivity;
 import com.melihcelenk.seslekontrol.modeller.SinyalGonderData;
 
 import retrofit2.Call;
@@ -16,7 +18,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Haberlesme {
-    public static void SinyalGonder(String ipAdresi, final int id, final Context context){
+    public static void SinyalGonder(String ipAdresi, final int id, final Context context, ProgressBar progressBar){
+        SinyalGonder(ipAdresi,id,context);
+    }
+    public static void SinyalGonder(final String ipAdresi, final int id, final Context context){
 
         String url="http://" + ipAdresi;
         Gson gson = new GsonBuilder()
@@ -33,7 +38,7 @@ public class Haberlesme {
                 @Override
                 public void onResponse(Call<SinyalGonderData> call, Response<SinyalGonderData> response) {
                     try{
-                        Log.v("sinyalResponse","Sinyalden cevap geldi");
+                        Log.v("sinyalResponse","Sinyalden cevap geldi. (IP:)"+ipAdresi);
                         if(response.isSuccessful()){
                             Log.v("sinyalResponse","Cevap başarılı");
                             SinyalGonderData sinyalGonderData = response.body();
@@ -43,6 +48,13 @@ public class Haberlesme {
                             }
                         }
                         else {
+                            /*TODO: Bu kısım denenmedi.*/
+                            try{
+                                new IPArkaplanKontrol(context).execute((Void) null);
+                            }catch(Exception e){
+                                Toast.makeText(context, "IP'ler güncellenirken bir sorun meydana geldi.", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
                             Toast.makeText(context, "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
                             Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
                         }
@@ -55,21 +67,32 @@ public class Haberlesme {
 
                 @Override
                 public void onFailure(Call<SinyalGonderData> call, Throwable t) {
+
                     Log.v("SinyalGonder","Cihazdan cevap gelmedi");
                     Log.v("SinyalBasarisiz","IP'ler güncellenecek...");
-                    /*TODO: IPBulveGuncelle'yi Thread içine al*/
+                    Toast.makeText(context, "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
+                    /*TODO: Bu kısım denenmedi.*/
                     try{
-                        //IPBulveGuncelle();
+                        new IPArkaplanKontrol(context).execute((Void) null);
                     }catch(Exception e){
+                        Toast.makeText(context, "IP'ler güncellenirken bir sorun meydana geldi.", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
-                    Toast.makeText(context, "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
+
                     /*TODO: IP'ler güncellenene kadar butonları kilitle */
                 }
             });
 
         }catch(Exception e){
             Log.v("RetrofitHata","Sinyal Gonderilemedi");
+            try{
+                Log.v("RetrofitHataIP","IP'ler güncellenecek");
+                e.printStackTrace();
+                new IPArkaplanKontrol(context).execute((Void) null);
+            }catch(Exception e1){
+               e1.printStackTrace();
+            }
+
             e.printStackTrace();
         }
     }//-----------------------------------SinyalGonder sonu---------------------------------------------------

@@ -38,7 +38,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     TextView txvResult;
-    Retrofit retrofit;
     DatabaseHandler db;
     ProgressBar progressBar;
     @Override

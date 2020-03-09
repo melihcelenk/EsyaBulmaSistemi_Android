@@ -28,13 +28,25 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         this.progressBar = progressBar;
         this.db = db;
     }
+    public IPArkaplanKontrol(Context context, DatabaseHandler db) {
+        this.context= context;
+        this.db = db;
+    }
+    public IPArkaplanKontrol(Context context) {
+        this.context= context;
+        this.db = new DatabaseHandler(context);
+    }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setMax(100);
-        progressBar.setProgress(10);
+        try {
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setMax(100);
+            progressBar.setProgress(10);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -58,14 +70,22 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     @Override
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
-        progressBar.setVisibility(View.INVISIBLE);
+        try {
+            progressBar.setVisibility(View.INVISIBLE);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         Integer currentProgress = values[0];
-        progressBar.setProgress(currentProgress);
+        try{
+            progressBar.setProgress(currentProgress);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         Log.v("OnProgressUpdate",values[0].toString());
     }
 
@@ -120,7 +140,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                 Log.v("IPBulveGuncelleHata","IP'ler güncellenirken bir hata meydana geldi");
             }
         }
-    }// Bağlantı kontrol sonu
+    }// Bağlantı kontrol sonu-------------------------------------------------------
     private void IPBulveGuncelle() {
         final ArrayList<bulunanCihaz> bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
         Log.v("IPBul","Cihazlar taranıyor...");

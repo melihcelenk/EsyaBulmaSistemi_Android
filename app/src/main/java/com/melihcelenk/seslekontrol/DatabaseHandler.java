@@ -205,7 +205,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         Bolge bolge = new Bolge(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1), cursor.getString(2),cursor.getString(3));
-
+        db.close();
         return bolge;
     }
 
@@ -229,7 +229,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 bolgeList.add(bolge);
             } while (cursor.moveToNext());
         }
-
+        db.close();
         return bolgeList;
     }
 
@@ -241,10 +241,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ETIKET, bolge.get_etiket());
         values.put(KEY_MAC_ADRESI, bolge.get_macAdresi());
         values.put(KEY_IP_ADRESI, bolge.get_ipAdresi());
-
-        // updating row
-        return db.update(TABLE_BOLGELER, values, KEY_ID + " = ?",
+        int x = db.update(TABLE_BOLGELER, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(bolge.get_id()) });
+        db.close();
+        return x;
     }
 
     public void deleteBolge(Bolge bolge) {
@@ -259,10 +259,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String countQuery = "SELECT  * FROM " + TABLE_BOLGELER;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
+        int x = cursor.getCount();
         cursor.close();
-
+        db.close();
         // return count
-        return cursor.getCount();
+        return x;
     }
 
     public List<Esya> getButunEsyalar() {
@@ -284,7 +285,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 esyaList.add(esya);
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
+        db.close();
         return esyaList;
     }
     public long addEsya(Esya esya) {

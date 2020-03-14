@@ -18,6 +18,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
+    private int sonlanmaDurumu;
     ProgressBar progressBar;
     DatabaseHandler db;
     private Context context;
@@ -44,7 +45,8 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         super.onPreExecute();
         guncellenemeyenBolgeler = new ArrayList<Bolge>();
         progressDurum=0;
-        progressDurumMax=10;
+        progressDurumMax=3;
+        sonlanmaDurumu=0;
         try {
             if(progressBar!=null){
                 progressBar.setVisibility(View.VISIBLE);
@@ -77,26 +79,6 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     }
 
     @Override
-    protected void onPostExecute(Void result) {
-        super.onPostExecute(result);
-        Toast.makeText(context, "IP değiştirme tamamlandı.???", Toast.LENGTH_SHORT).show();
-        // TODO: Buton kilitleri burada açılacak
-        try {
-            if(progressBar!=null){
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        //TODO: Burası BaglantiKontrol sonlanmadan çalışıyor. onPostExecute BaglantiKontrol bittiğinde çalışmalı
-        for(Bolge b : guncellenemeyenBolgeler){
-                Toast.makeText(context, "Cihaza ulaşılamadı:"+b.get_etiket(), Toast.LENGTH_SHORT).show();
-                Log.v("IPNull","IP:null"+" MAC:"+b.get_macAdresi());
-        }
-    }
-
-    @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         Integer currentProgress = values[0];
@@ -115,6 +97,31 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
             e.printStackTrace();
         }
         Log.v("OnProgressUpdate",values[0].toString());
+    }
+
+    @Override
+    protected void onPostExecute(Void result) {
+        super.onPostExecute(result);
+
+        Log.v("OnPostExecute","sonlanmaDurumu1:"+sonlanmaDurumu);
+
+        // TODO: BU KISIM WHILE SONLANMADAN ÇALIŞMIŞ OLABİLİR
+        Log.v("OnPostExecute","sonlanmaDurumu2:"+sonlanmaDurumu);
+        Toast.makeText(context, "IP değiştirme tamamlandı.???", Toast.LENGTH_SHORT).show();
+        // TODO: Buton kilitleri burada açılacak
+        try {
+            if(progressBar!=null){
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        //TODO: Burası BaglantiKontrol sonlanmadan çalışıyor. onPostExecute BaglantiKontrol bittiğinde çalışmalı
+        for(Bolge b : guncellenemeyenBolgeler){
+            Toast.makeText(context, "Cihaza ulaşılamadı:"+b.get_etiket(), Toast.LENGTH_SHORT).show();
+            Log.v("IPNull","IP:null"+" MAC:"+b.get_macAdresi());
+        }
     }
 
     @Override
@@ -151,7 +158,6 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                     Log.v("BaglantiKontrol", "Bir hata var. Cihazdaki IP: "+nodeData.getIp()+" Eski IP:"+bolge.get_ipAdresi());
                 }
 
-
             }catch(Exception e){
                 Log.v("YanlisIP", "Ulaşılamayan IP: "+bolge.get_ipAdresi()+ " , MAC adresi: "+ bolge.get_macAdresi());
                 yanlisIPliCihazSayisi[0]++;
@@ -170,6 +176,13 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                 Log.v("IPBulveGuncelleHata","IP'ler güncellenirken bir hata meydana geldi");
             }
         }
+        else {
+            sonlanmaDurumu++;
+            Log.v("BaglantiKontrolSonu","Bağlantı kontrolü sonlandı. sonlanmaDurumu:"+sonlanmaDurumu);
+        }
+        while(sonlanmaDurumu==0){
+
+        }
     }// Bağlantı kontrol sonu-------------------------------------------------------
     private void IPBulveGuncelle() {
         final ArrayList<bulunanCihaz> bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
@@ -178,8 +191,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         final long startTimeMillis = System.currentTimeMillis();
         try{
             /* TODO: Lokal IP alınamadığında uygulama çöküyor*/
-            /* TODO: Sinyalde hata olursa IP güncelleme eklenecek */
-            /*TODO: ArpInfo, ARPInfo.getIPAddressFromMAC(null) | MAC ile bulma ekle*/
+
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
                 @Override
                 public void onDeviceFound(Device device) {
@@ -229,7 +241,8 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                             e.printStackTrace();
                         }
                     }
-
+                    sonlanmaDurumu++;
+                    Log.v("onFinished","sonlanmaDurumu2:"+sonlanmaDurumu);
                 }
             });
         }catch(Exception e){
@@ -257,12 +270,8 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
             Log.v("RetrofitHata",e.getLocalizedMessage());
             e.printStackTrace();
             return null;
-
         }
     }//----------------------arananCihazsaGetir sonu------------------------------
-
-
-
 }
 
 

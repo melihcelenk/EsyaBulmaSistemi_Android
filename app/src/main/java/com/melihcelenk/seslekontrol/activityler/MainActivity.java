@@ -51,6 +51,17 @@ public class MainActivity extends AppCompatActivity {
         /* TODO: Açılışta başka bir thread'de bütün cihazlara istek gönderip birinden cevap gelmeyince IPBulveGuncelle çalıştırılsın.*/
         new IPArkaplanKontrol(MainActivity.this,progressBar,db).execute((Void) null);
 
+        //KONTROL AMAÇLI KONULDU TODO: SİLİNECEK
+        final int[] i = {23};
+        txvResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i[0]++;
+                txvResult.setText("mesela"+i[0]);
+            }
+        });
+        // final int[] i = {23}; SATIRINDAN BURAYA KADAR SİLİNECEK
+
     } // onCreate sonu
 
     public void getSpeechInput(View view){

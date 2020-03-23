@@ -45,7 +45,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         super.onPreExecute();
         guncellenemeyenBolgeler = new ArrayList<Bolge>();
         progressDurum=0;
-        progressDurumMax=3;
+        progressDurumMax=15;
         sonlanmaDurumu=0;
         try {
             if(progressBar!=null){
@@ -181,7 +181,12 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
             Log.v("BaglantiKontrolSonu","Bağlantı kontrolü sonlandı. sonlanmaDurumu:"+sonlanmaDurumu);
         }
         while(sonlanmaDurumu==0){
-
+            try {
+                Thread.sleep(100);
+                if(sonlanmaDurumu==1){Log.v("whileIci","sonlanmaDurumu:"+sonlanmaDurumu);}
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }// Bağlantı kontrol sonu-------------------------------------------------------
     private void IPBulveGuncelle() {

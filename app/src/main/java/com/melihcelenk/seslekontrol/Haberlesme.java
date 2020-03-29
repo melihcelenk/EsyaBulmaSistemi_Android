@@ -46,17 +46,14 @@ public class Haberlesme {
                                 Toast.makeText(context, "Sinyal Gonderildi.", Toast.LENGTH_SHORT).show();
                                 Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
                             }
-                        }
-                        else { // IP, bu projeye ait farklı bir cihaza aitse bu durum çalışır
-                            /*TODO: Bu kısım denenmedi. Farklı IP'deki bir cihaz durumu*/
-                            try{
-                                new IPArkaplanKontrol(context).execute((Void) null);
-                            }catch(Exception e){
-                                Toast.makeText(context, "IP'ler güncellenirken bir sorun meydana geldi.", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
+                            else{ // IP, bu projeye ait farklı bir cihaza aitse bu durum çalışır
+                                Log.v("sinyalResponse","Cevap ulaşılmak istenen cihazdan değil. IP'ler güncellenecek.");
+                                IPleriGuncelle();
                             }
-                            Toast.makeText(context, "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
-                            Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
+                        }
+                        else {
+                            Log.v("sinyalResponse","Başarısız cevap. IP'ler güncellenecek.");
+                            IPleriGuncelle();
                         }
                     }catch(JsonIOException e){
                         Log.v("sinyalResponse","Sinyalden gelen cevapta hata oluştu");
@@ -70,14 +67,21 @@ public class Haberlesme {
                     Log.v("SinyalGonder","Cihazdan cevap gelmedi");
                     Log.v("SinyalBasarisiz","IP'ler güncellenecek...");
                     Toast.makeText(context, "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
+                    IPleriGuncelle();
+
+                    /*TODO: IP'ler güncellenene kadar butonları kilitle */
+                }
+
+                private void IPleriGuncelle() {
+                    /*TODO: Bu kısım denenmedi. Farklı IP'deki bir cihaz durumu*/
                     try{
                         new IPArkaplanKontrol(context).execute((Void) null);
                     }catch(Exception e){
                         Toast.makeText(context, "IP'ler güncellenirken bir sorun meydana geldi.", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
-
-                    /*TODO: IP'ler güncellenene kadar butonları kilitle */
+                    Toast.makeText(context, "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
+                    Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
                 }
             });
 
@@ -94,4 +98,6 @@ public class Haberlesme {
             e.printStackTrace();
         }
     }//-----------------------------------SinyalGonder sonu---------------------------------------------------
+
+
 }

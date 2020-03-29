@@ -2,8 +2,11 @@ package com.melihcelenk.seslekontrol.activityler;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
@@ -14,20 +17,20 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
 import com.melihcelenk.seslekontrol.DatabaseHandler;
 import com.melihcelenk.seslekontrol.Haberlesme;
 import com.melihcelenk.seslekontrol.IPArkaplanKontrol;
+import com.melihcelenk.seslekontrol.IPArkaplanKontrol2;
 import com.melihcelenk.seslekontrol.LedControllerI;
 import com.melihcelenk.seslekontrol.R;
 import com.melihcelenk.seslekontrol.activityler.esyalarilisteleactivity.EsyalariListeleActivity;
 import com.melihcelenk.seslekontrol.activityler.kurulumactivity.KurulumActivity;
 import com.melihcelenk.seslekontrol.modeller.Esya;
 import com.melihcelenk.seslekontrol.modeller.NodeData;
-import com.melihcelenk.seslekontrol.modeller.SinyalGonderData;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,10 +51,25 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         txvResult = findViewById(R.id.textView);
         db = new DatabaseHandler(this);
-        /* TODO: Açılışta başka bir thread'de bütün cihazlara istek gönderip birinden cevap gelmeyince IPBulveGuncelle çalıştırılsın.*/
-        new IPArkaplanKontrol(MainActivity.this,progressBar,db).execute((Void) null);
+        try {
+            final MutableLiveData<String> ipSonuc = new MutableLiveData<>();
+            ipSonuc.setValue("Bekleniyor...");
 
-        //KONTROL AMAÇLI KONULDU TODO: SİLİNECEK
+            txvResult.setText("Sonuç:"+ ipSonuc.getValue());
+            ipSonuc.observe(MainActivity.this, new Observer<String>() {
+                @Override
+                public void onChanged(String s) {
+                    txvResult.setText("Arkaplan sonlandı:"+ipSonuc.getValue());
+                }
+            });
+
+            AsyncTask<Void, Integer, String> ipArkaplanKontrol = new IPArkaplanKontrol2(MainActivity.this,progressBar,db,ipSonuc).execute((Void) null);
+
+
+        }catch(Exception e){}
+
+
+        //KONTROL AMAÇLI KONULDU TODO: SİLİNECEK------------------
         final int[] i = {23};
         txvResult.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,12 +80,14 @@ public class MainActivity extends AppCompatActivity {
         });
         // final int[] i = {23}; SATIRINDAN BURAYA KADAR SİLİNECEK
 
+
     } // onCreate sonu
+
 
     public void getSpeechInput(View view){
         /*TODO: hızlı sonlanma sorununu çöz, bir token'a göre sonlanmayı araştır*/
         /* TODO: Hata kontrolleri ve ara yüzler, daha sonra eşyayı anahtar kelimelerle ekleme yapılacak:
-        *  Eşyayı ara, eğer birden fazla bulunursa gelen değerler içinde arama yap, tekrar DB'ye bağlanma  */
+        *  TODO: Eşyayı ara, eğer birden fazla bulunursa gelen değerler içinde arama yap, tekrar DB'ye bağlanma  */
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -138,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     else if(result.get(0).contains("listele")){
-                        // TODO: eşyaları listele recyclerview için adaptör tasarla
                     }
                 }
                 break;
@@ -173,64 +192,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*TODO: Silinecek */
-    public void ASinyalGonder(String ipAdresi, final int id){
 
-        String url="http://" + ipAdresi;
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        try {
-            LedControllerI ledControllerIService= retrofit.create(LedControllerI.class);
-            Call<SinyalGonderData> call = ledControllerIService.getSinyalGonderData(String.valueOf(id),String.valueOf(23));
-            call.enqueue(new Callback<SinyalGonderData>() {
-                @Override
-                public void onResponse(Call<SinyalGonderData> call, Response<SinyalGonderData> response) {
-                    try{
-                        Log.v("sinyalResponse","Sinyalden cevap geldi");
-                        if(response.isSuccessful()){
-                            Log.v("sinyalResponse","Cevap başarılı");
-                            SinyalGonderData sinyalGonderData = response.body();
-                            if(sinyalGonderData.getId() == String.valueOf(id) && sinyalGonderData.getDurum() == String.valueOf(23)) {
-                                Toast.makeText(getApplicationContext(), "Sinyal Gonderildi.", Toast.LENGTH_SHORT).show();
-                                Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
-                            }
-                        }
-                        else {
-                            Toast.makeText(getApplicationContext(), "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
-                            Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
-                        }
-                    }catch(JsonIOException e){
-                        Log.v("sinyalResponse","Sinyalden gelen cevapta hata oluştu");
-                        e.printStackTrace();
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<SinyalGonderData> call, Throwable t) {
-                    Log.v("SinyalGonder","Cihazdan cevap gelmedi");
-                    Log.v("SinyalBasarisiz","IP'ler güncellenecek...");
-                    /*TODO: IPBulveGuncelle'yi Thread içine al*/
-                    try{
-                        //IPBulveGuncelle();
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                    Toast.makeText(getApplicationContext(), "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
-                    /*TODO: IP'ler güncellenene kadar butonları kilitle */
-                }
-            });
-
-        }catch(Exception e){
-            Log.v("RetrofitHata","Sinyal Gonderilemedi");
-            e.printStackTrace();
-        }
-    }//-----------------------------------SinyalGonder sonu---------------------------------------------------
 
 
 

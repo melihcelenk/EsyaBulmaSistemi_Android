@@ -1,10 +1,13 @@
 package com.melihcelenk.seslekontrol;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,29 +16,33 @@ import com.melihcelenk.seslekontrol.modeller.NodeData;
 import com.melihcelenk.seslekontrol.modeller.bulunanCihaz;
 import com.stealthcopter.networktools.SubnetDevices;
 import com.stealthcopter.networktools.subnet.Device;
+
 import java.util.ArrayList;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
+public class IPArkaplanKontrol2 extends AsyncTask<Void, Integer, String>{
     private int sonlanmaDurumu;
     ProgressBar progressBar;
     DatabaseHandler db;
     private Context context;
     private int progressDurum;
     private int progressDurumMax;
+    private MutableLiveData<String> ipSonuc;
     ArrayList<Bolge> guncellenemeyenBolgeler;
 
-    public IPArkaplanKontrol(Context context, ProgressBar progressBar, DatabaseHandler db) {
+    public IPArkaplanKontrol2(Context context, ProgressBar progressBar, DatabaseHandler db, MutableLiveData<String> ipSonuc) {
         this.context= context;
         this.progressBar = progressBar;
         this.db = db;
+        this.ipSonuc = ipSonuc;
     }
-    public IPArkaplanKontrol(Context context, DatabaseHandler db) {
+    public IPArkaplanKontrol2(Context context, DatabaseHandler db) {
         this.context= context;
         this.db = db;
     }
-    public IPArkaplanKontrol(Context context) {
+    public IPArkaplanKontrol2(Context context) {
         this.context= context;
         this.db = new DatabaseHandler(context);
     }
@@ -61,7 +68,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
 //        for (int i = 0; i < 101; i = i + 10) {
 //            try {
 //                publishProgress(i);
@@ -75,7 +82,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         }
         catch (Exception e) {
         }
-        return null;
+        return "doInBackground String";
     }
 
     @Override
@@ -100,7 +107,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
     }
 
     @Override
-    protected void onPostExecute(Void result) {
+    protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
         Log.v("OnPostExecute","sonlanmaDurumu:"+sonlanmaDurumu);
@@ -114,16 +121,18 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
         }catch(Exception e){
             e.printStackTrace();
         }
-
+        Log.v("onPostExecute", "Güncellenemeyen bölgeler listeleniyor...");
         for(Bolge b : guncellenemeyenBolgeler){
             Toast.makeText(context, "Cihaza ulaşılamadı:"+b.get_etiket(), Toast.LENGTH_SHORT).show();
-            Log.v("IPNull","IP:null"+" MAC:"+b.get_macAdresi());
+            Log.v("onPostExecute","Id:" + b.get_id() + " Etiket:" + b.get_etiket() + " IP:"+ b.get_ipAdresi() +" MAC:"+b.get_macAdresi());
         }
+
         Log.v("IPArkaplanKontrol","onPostExecute: IPArkaplanKontrol sonlandı.");
-    }
+        ipSonuc.setValue("Son");
+    }//onPostExecute sonu
 
     @Override
-    protected void onCancelled(Void result) {
+    protected void onCancelled(String result) {
         super.onCancelled(result);
 
     }
@@ -153,7 +162,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, Void>{
                 else {
                     yanlisIPliCihazSayisi[0]++;
                     guncellenemeyenBolgeler.add(bolge);
-                    Log.v("BaglantiKontrol", "Bir hata var. Cihazdaki ID ve IP: "+ nodeData.getNodeId() + " " + nodeData.getIp()+" Kayıtlı ID ve IP:"+bolge.get_ipAdresi());
+                    Log.v("BaglantiKontrol", "Bir hata var. Cihazdaki ID ve IP: "+ nodeData.getNodeId() + " " + nodeData.getIp()+" Kayıtlı ID ve IP: "+bolge.get_id() + " " + bolge.get_ipAdresi());
                 }
 
             }catch(Exception e){

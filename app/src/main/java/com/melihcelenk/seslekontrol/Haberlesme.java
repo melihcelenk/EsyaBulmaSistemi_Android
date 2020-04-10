@@ -5,10 +5,11 @@ import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import com.melihcelenk.seslekontrol.activityler.MainActivity;
 import com.melihcelenk.seslekontrol.modeller.SinyalGonderData;
 
 import retrofit2.Call;
@@ -18,10 +19,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Haberlesme {
-    public static void SinyalGonder(String ipAdresi, final int id, final Context context, ProgressBar progressBar){
-        SinyalGonder(ipAdresi,id,context);
+    public static void SinyalGonder(String ipAdresi, final int id, final Context context, final MutableLiveData<String> ipSonuc, ProgressBar progressBar){
+        SinyalGonder(ipAdresi,id,context, ipSonuc);
     }
-    public static void SinyalGonder(final String ipAdresi, final int id, final Context context){
+    public static void SinyalGonder(final String ipAdresi, final int id, final Context context, final MutableLiveData<String> ipSonuc){
 
         String url="http://" + ipAdresi;
         Gson gson = new GsonBuilder()
@@ -40,11 +41,16 @@ public class Haberlesme {
                     try{
                         Log.v("sinyalResponse","Sinyalden cevap geldi. (IP:"+ipAdresi+")");
                         if(response.isSuccessful()){
-                            Log.v("sinyalResponse","Cevap başarılı");
                             SinyalGonderData sinyalGonderData = response.body();
-                            if(sinyalGonderData.getId() == String.valueOf(id) && sinyalGonderData.getDurum() == String.valueOf(23)) {
-                                Toast.makeText(context, "Sinyal Gonderildi.", Toast.LENGTH_SHORT).show();
-                                Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
+                            Log.v("sinyalResponse","Cevap başarılı. Gönderilen ID:"+id + " Gelen ID:" + sinyalGonderData.getId());
+                            Log.v("sinyalResponse","Gönderilen Durum:"+23 + " Gelen Durum:" + sinyalGonderData.getDurum());
+                            if(sinyalGonderData.getId().equals(String.valueOf(id))) {
+                                Log.v("sinyalResponse","ID'ler uyuşuyor.");
+                                if(sinyalGonderData.getDurum().equals(String.valueOf(200))){
+                                    Toast.makeText(context, "Sinyal Gonderildi.", Toast.LENGTH_SHORT).show();
+                                    Log.v("IDSinyal:",id + " numaralı ID'ye sinyal gönderildi.");
+                                }
+                                else { Log.v("sinyalResponse","Durumlar uyuşmuyor." + String.valueOf(200)); }
                             }
                             else{ // IP, bu projeye ait farklı bir cihaza aitse bu durum çalışır
                                 Log.v("sinyalResponse","Cevap ulaşılmak istenen cihazdan değil. IP'ler güncellenecek.");
@@ -73,15 +79,16 @@ public class Haberlesme {
                 }
 
                 private void IPleriGuncelle() {
+                    Toast.makeText(context, "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
+                    Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
+
                     /*TODO: Bu kısım denenmedi. Farklı IP'deki bir cihaz durumu*/
                     try{
-                        new IPArkaplanKontrol(context).execute((Void) null);
+                        new IPArkaplanKontrol(context,ipSonuc).execute((Void) null);
                     }catch(Exception e){
                         Toast.makeText(context, "IP'ler güncellenirken bir sorun meydana geldi.", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
-                    Toast.makeText(context, "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
-                    Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
                 }
             });
 
@@ -90,7 +97,7 @@ public class Haberlesme {
             try{
                 Log.v("RetrofitHataIP","IP'ler güncellenecek");
                 e.printStackTrace();
-                new IPArkaplanKontrol(context).execute((Void) null);
+                new IPArkaplanKontrol(context,ipSonuc).execute((Void) null);
             }catch(Exception e1){
                e1.printStackTrace();
             }

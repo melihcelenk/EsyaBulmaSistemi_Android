@@ -20,7 +20,6 @@ import com.google.gson.GsonBuilder;
 import com.melihcelenk.seslekontrol.DatabaseHandler;
 import com.melihcelenk.seslekontrol.Haberlesme;
 import com.melihcelenk.seslekontrol.IPArkaplanKontrol;
-import com.melihcelenk.seslekontrol.IPArkaplanKontrol2;
 import com.melihcelenk.seslekontrol.LedControllerI;
 import com.melihcelenk.seslekontrol.R;
 import com.melihcelenk.seslekontrol.activityler.esyalarilisteleactivity.EsyalariListeleActivity;
@@ -30,7 +29,6 @@ import com.melihcelenk.seslekontrol.modeller.NodeData;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txvResult;
     DatabaseHandler db;
     ProgressBar progressBar;
+    MutableLiveData<String> ipSonuc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,11 +50,12 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         txvResult = findViewById(R.id.textView);
         db = new DatabaseHandler(this);
+        ipSonuc = new MutableLiveData<>();
         try {
-            final MutableLiveData<String> ipSonuc = new MutableLiveData<>();
-            ipSonuc.setValue("Bekleniyor...");
 
+            ipSonuc.setValue("Bekleniyor...");
             txvResult.setText("Sonuç:"+ ipSonuc.getValue());
+
             ipSonuc.observe(MainActivity.this, new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            AsyncTask<Void, Integer, String> ipArkaplanKontrol = new IPArkaplanKontrol2(MainActivity.this,progressBar,db,ipSonuc).execute((Void) null);
+            AsyncTask<Void, Integer, String> ipArkaplanKontrol = new IPArkaplanKontrol(MainActivity.this,progressBar,db,ipSonuc).execute((Void) null);
 
 
         }catch(Exception e){}
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
                             String sinyalGonderilecekIP = db.getBolge(sinyalGonderilecekID).get_ipAdresi();
                             Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
-                            Haberlesme.SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID,getApplicationContext());
+                            Haberlesme.SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID,getApplicationContext(),ipSonuc);
                         }catch(Exception e){
                             e.printStackTrace();
                         }

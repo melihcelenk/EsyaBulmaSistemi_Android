@@ -28,11 +28,13 @@ public class esyalarAdapter extends RecyclerView.Adapter<esyalarAdapter.MyViewHo
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView esyaAdi;
+        public TextView esyaAnahtarKelimeler;
         public Button esyayaSinyalBtn;
 
         public MyViewHolder(View itemView, final OnItemClickListener listener) {
             super(itemView);
             esyaAdi = itemView.findViewById(R.id.esyaAdiTV);
+            esyaAnahtarKelimeler = itemView.findViewById(R.id.esyaAnahtarKelimelerTV);
             esyayaSinyalBtn = itemView.findViewById(R.id.esyayaSinyalBtn);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +83,9 @@ public class esyalarAdapter extends RecyclerView.Adapter<esyalarAdapter.MyViewHo
     public void onBindViewHolder(MyViewHolder holder, int position) {
         String simdiki = mDataset.get(position).get_esyaAdi();
         holder.esyaAdi.setText(simdiki);
+
+        String simdikiAnahtar = mDataset.get(position).get_esyaAnahtarKelimelerString();
+        holder.esyaAnahtarKelimeler.setText(simdikiAnahtar);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

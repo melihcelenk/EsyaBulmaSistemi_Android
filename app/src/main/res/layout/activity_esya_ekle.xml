@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activityler.EsyaEkleActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/arkaplan"
+        android:orientation="vertical"
+        android:padding="15dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="16dp">
+
+        <TextView
+            android:id="@+id/aciklamaTV_esyaEkleAct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aşağıdaki bilgilerle eşya kaydetmek istiyor musunuz?" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eşya Adı:"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/esyaAdi_esyaEkleAct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bölge:"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/bolgeTV_esyaEkleAct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <Button
+            android:id="@+id/tekrarDeneBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/butonlar"
+            android:onClick="tekrarDene"
+            android:text="Tekrar Dene" />
+
+        <Button
+            android:id="@+id/anahtarKelimeleriSoyleBtn_esyaEkleAct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/butonlar"
+            android:onClick="anahtarSoyle"
+            android:text="Anahtar Kelimeleri Söyle" />
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Anahtar Kelimeler:"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/anahtarKelimelerET_esyaEkleAct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/esyaKaydetBtn_esyaEkleAct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/butonlar"
+            android:text="Kaydet" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

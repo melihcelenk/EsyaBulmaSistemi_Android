@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SesleKontrol</string>
+    <string name="app_name">Eşya Bul</string>
     <string name="title_activity_esyalari_listele">EsyalariListeleActivity</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>

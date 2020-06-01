@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimary">#9C2D00</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#FF9800</color>
-    <color name="colorPrimaryText">#212121</color>
-    <color name="colorSecondaryText">#757575</color>
-    <color name="colorIcons">#FFFFFF</color>
-    <color name="colorDivider">#BDBDBD</color>
+    <color name="colorAccent">#7E2400</color>
+    <color name="arkaplan2">#FFF7AF</color>
+    <color name="butonlar">#FFF172</color>
+    <color name="colorPrimaryText">#151515</color>
+    <color name="colorSecondaryText">#515151</color>
+    <color name="colorIcons">#FFF7AB</color>
+    <color name="colorDivider">#000000</color>
     <color name="black_effective">#2a2a2a</color>
+    <color name="arkaplan">#FFF1D6</color>
 </resources>

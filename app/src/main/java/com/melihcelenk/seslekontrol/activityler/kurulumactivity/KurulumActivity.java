@@ -172,7 +172,7 @@ public class KurulumActivity extends AppCompatActivity {
                 @Override
                 public void onFinished(ArrayList<Device> devicesFound) {
                     //float timeTaken =  (System.currentTimeMillis() - startTimeMillis)/1000.0f;
-                    sonucTextveButonDegistir("Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size(),true);
+                    sonucTextveButonDegistir("Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size() + "\n\nListedeki her bir cihazın üstüne tıklayarak etiket veriniz.",true);
                     //sonucTextveButonDegistir("Finished "+timeTaken+" s");
                 }
             });

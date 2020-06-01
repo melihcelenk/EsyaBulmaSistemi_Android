@@ -24,7 +24,6 @@ import com.melihcelenk.seslekontrol.LedControllerI;
 import com.melihcelenk.seslekontrol.R;
 import com.melihcelenk.seslekontrol.activityler.esyalarilisteleactivity.EsyalariListeleActivity;
 import com.melihcelenk.seslekontrol.activityler.kurulumactivity.KurulumActivity;
-import com.melihcelenk.seslekontrol.modeller.Esya;
 import com.melihcelenk.seslekontrol.modeller.NodeData;
 
 import java.util.ArrayList;
@@ -107,16 +106,16 @@ public class MainActivity extends AppCompatActivity {
     }
     public void esyalariListeleActivityGit(View view){
         Intent intent = new Intent(getApplicationContext(), EsyalariListeleActivity.class);
+        intent.putExtra("listelemeModu","hepsi");
+        startActivity(intent);
+    }
+    public void yeniEsyaEkle(View view){
+        Intent intent = new Intent(getApplicationContext(), EsyaEkleActivity.class);
+        intent.putExtra("listelemeModu","hepsi");
         startActivity(intent);
     }
 
-    public void esyalariLogla(){
-        ArrayList<Esya> butunEsyalar = (ArrayList<Esya>) db.getButunEsyalar();
-        for (Esya cn : butunEsyalar) {
-            String log = "esyaId: " + cn.get_esyaId() + "\tbolgeId: " + cn.get_bolgeId() + "\tesyaAdi: " + cn.get_esyaAdi();
-            Log.d("BolgeBilgi: ", log);
-        }
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -136,11 +135,27 @@ public class MainActivity extends AppCompatActivity {
                         try{
                             Log.v("SinyalGonder","Gonderilecek");
                             Log.v("Token:","tokens[0]:" + tokens[0].trim() + "$");
-                            int sinyalGonderilecekID = db.bolgeIdGetirEsyaAdiIle(tokens[0].trim());
-                            Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
-                            String sinyalGonderilecekIP = db.getBolge(sinyalGonderilecekID).get_ipAdresi();
-                            Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
-                            Haberlesme.SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID,getApplicationContext(),ipSonuc);
+                            ArrayList<Integer> uyusanIDler =  db.esyaIdGetirEsyaAdiIle(tokens[0].trim());
+                            if(uyusanIDler.size()>0){
+                                if(uyusanIDler.size()==1){
+                                    int sinyalGonderilecekID = db.EsyaGetirIdIle(uyusanIDler.get(0)).get_bolgeId();
+                                    Log.v("SinyalGonderilecekID",""+sinyalGonderilecekID);
+                                    String sinyalGonderilecekIP = db.getBolge(sinyalGonderilecekID).get_ipAdresi();
+                                    Log.v("SinyalGonderilecekIP",sinyalGonderilecekIP);
+                                    Haberlesme.SinyalGonder(sinyalGonderilecekIP,sinyalGonderilecekID,getApplicationContext(),ipSonuc);
+                                }
+                                else{
+
+                                    Intent intent = new Intent(getApplicationContext(), EsyalariListeleActivity.class);
+                                    intent.putExtra("esyaAdi",tokens[0].trim());
+                                    startActivity(intent);
+                                }
+
+                            }
+                            else{
+                                Toast.makeText(this, tokens[0] + " sistemde kayıtlı değil.", Toast.LENGTH_SHORT).show();
+                            }
+
                         }catch(Exception e){
                             e.printStackTrace();
                         }
@@ -149,15 +164,19 @@ public class MainActivity extends AppCompatActivity {
                         String str = result.get(0);
                         String delims = "ekle+";
                         String[] tokens = str.split(delims);
-                        try{
-                            int eklenecekID = db.idGetirEtiketIle(tokens[0].trim());
-                            db.addEsya(new Esya(eklenecekID,tokens[1].trim()));
-                            esyalariLogla();
-                        }catch(Exception e){
-                            e.printStackTrace();
+
+                        // Zikredilen bölgenin mevcut olup olmadığının kontrolü
+                        if(db.getBolgeEtiketIle(tokens[0].trim())==null){
+                            Toast.makeText(this, tokens[0] + " adında bir bölge yok.", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            Intent intent = new Intent(getApplicationContext(), EsyaEkleActivity.class);
+                            intent.putExtra("bolge",tokens[0].trim());
+                            intent.putExtra("esyaAdi",tokens[1].trim());
+                            startActivity(intent);
                         }
                     }
-                    else if(result.get(0).contains("listele")){
+                    else if(result.get(0).contains("listele")){ // TODO: Düzenlenecek
                     }
                 }
                 break;

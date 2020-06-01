@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activityler.esyalarilisteleactivity.EsyalariListeleActivity"></activity>
+        <activity android:name=".activityler.EsyaEkleActivity"></activity>
+        <activity android:name=".activityler.esyalarilisteleactivity.EsyalariListeleActivity" />
         <activity android:name=".activityler.KonfigureEtActivity" />
         <activity android:name=".activityler.KayitliBolgelerActivity" />
         <activity android:name=".activityler.PinBelirleActivity" />

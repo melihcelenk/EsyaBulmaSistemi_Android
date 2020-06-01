@@ -23,13 +23,12 @@ import java.util.ArrayList;
 
 public class EsyalariListeleActivity extends AppCompatActivity {
 
-    private RecyclerView esyalarRV;
-    private esyalarAdapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    RecyclerView esyalarRV;
+    esyalarAdapter mAdapter;
+    RecyclerView.LayoutManager layoutManager;
     ArrayList<Esya> bulunanEsyalarArray;
-    private TextView sonucText;
     MutableLiveData<String> ipSonuc;
-    TextView txvResult;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,40 +36,29 @@ public class EsyalariListeleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_esyalari_listele);
         setTitle("Eşyalar");
 
+        final DatabaseHandler db = new DatabaseHandler(this);
+        // Asenkron çalışmanın sonucunu görebilmek için sürekli dinlenilen canlı bir değişken kullanılıyor
         ipSonuc = new MutableLiveData<>();
-        txvResult = findViewById(R.id.sonucText);
+
         try {
-
             ipSonuc.setValue("Bekleniyor...");
-            txvResult.setText("Sonuç:"+ ipSonuc.getValue());
-
             ipSonuc.observe(EsyalariListeleActivity.this, new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
-                    txvResult.setText("Arkaplan sonlandı:"+ipSonuc.getValue());
+                    Log.v("IpSonucDegisti",ipSonuc.getValue());
                 }
             });
-
             AsyncTask<Void, Integer, String> ipArkaplanKontrol = new IPArkaplanKontrol(EsyalariListeleActivity.this,ipSonuc).execute((Void) null);
-
-
         }catch(Exception e){}
 
 
-
-        sonucText = findViewById(R.id.sonucText);
-        final DatabaseHandler db = new DatabaseHandler(this);
-
-
-        //
-
         Intent intent = getIntent();
-
         final String listelemeModu = intent.getStringExtra("listelemeModu");
-
+        // Eğer başka bir aktiviteden bütün eşyaların listelenmesi istendiyse
         if(listelemeModu.equals("hepsi")){
             bulunanEsyalarArray = (ArrayList<Esya>) db.getButunEsyalar();
         }
+        // Bir eşya araması yapılmışsa ve sadece eşleşenler aranıyorsa
         else if(listelemeModu.equals("ozelArama")){
             final String esyaAdi = intent.getStringExtra("esyaAdi");
             ArrayList<Integer> uyusanIDler =  db.esyaIdGetirEsyaAdiIle(esyaAdi);
@@ -80,7 +68,6 @@ public class EsyalariListeleActivity extends AppCompatActivity {
             }
         }
 
-        //
 
         esyalarRV = (RecyclerView) findViewById(R.id.esyalarRV);
         layoutManager = new LinearLayoutManager(this);
@@ -88,10 +75,13 @@ public class EsyalariListeleActivity extends AppCompatActivity {
         mAdapter = new esyalarAdapter(bulunanEsyalarArray);
         esyalarRV.setAdapter(mAdapter);
 
+        // Adapter çalışma mantığı için bkz esyalarAdapter
         mAdapter.setOnItemClickListener(new esyalarAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
+                int id = bulunanEsyalarArray.get(position).get_bolgeId();
+                String esyaAdi = bulunanEsyalarArray.get(position).get_esyaAdi();
+                Toast.makeText(EsyalariListeleActivity.this, esyaAdi + ", "+db.etiketGetirBolgeIdIle(id)+ " bölgesinde", Toast.LENGTH_SHORT).show();
             }
 
 
@@ -105,7 +95,7 @@ public class EsyalariListeleActivity extends AppCompatActivity {
                 ipSonuc.observe(EsyalariListeleActivity.this, new Observer<String>() {
                     @Override
                     public void onChanged(String s) {
-                        sonucText.setText("Arkaplan sonlandı:"+ipSonuc.getValue());
+
                     }
                 });
                 Haberlesme.SinyalGonder(ip,id,getApplicationContext(), ipSonuc);

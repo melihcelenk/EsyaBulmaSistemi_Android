@@ -13,6 +13,9 @@ import com.melihcelenk.seslekontrol.modeller.Esya;
 
 import java.util.ArrayList;
 
+// Bu Adapter EsyalariListeleActivity üzerinde çalışmak üzere res/layout/esyalar_list_item.xml layoutunu kullanarak çalışmaktadır
+// Çalışma mantığı için bkz: https://youtu.be/Nw9JF55LDzE
+
 public class esyalarAdapter extends RecyclerView.Adapter<esyalarAdapter.MyViewHolder> {
     private ArrayList<Esya> mDataset;
 
@@ -66,11 +69,10 @@ public class esyalarAdapter extends RecyclerView.Adapter<esyalarAdapter.MyViewHo
         mDataset = myDataset;
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public esyalarAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
                                                           int viewType) {
-        // create a new view
+        // Yeni bir View oluştur
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.esyalar_list_item, parent, false);
 
@@ -78,7 +80,7 @@ public class esyalarAdapter extends RecyclerView.Adapter<esyalarAdapter.MyViewHo
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    //View içeriğini değiştir
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         String simdiki = mDataset.get(position).get_esyaAdi();

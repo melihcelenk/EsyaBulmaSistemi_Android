@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.melihcelenk.seslekontrol.modeller.Bolge;
 import com.melihcelenk.seslekontrol.modeller.Esya;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +35,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        //3rd argument to be passed is CursorFactory instance
     }
 
-    // Creating Tables
+    // Tablolar oluşturuluyor: BOLGELER, ESYALAR, ESYA_ANAHTAR_KELIMELER
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_BOLGELER_TABLOSU = "CREATE TABLE " + TABLE_BOLGELER + "("
@@ -65,14 +63,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_ESYA_ANAHTAR_KELIMELER_TABLOSU);
     }
 
-    // Upgrading database
+    // Veri tabanı güncelleniyor
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older table if existed
+        // Eski tablolar varsa yeniden oluşturuluyor
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOLGELER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ESYALAR);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ESYA_ANAHTAR_KELIMELER);
-        // Create tables again
         onCreate(db);
     }
 

@@ -75,14 +75,12 @@ public class Haberlesme {
                     Toast.makeText(context, "Cihazdan cevap gelmedi. IP'ler güncellenecek.", Toast.LENGTH_LONG).show();
                     IPleriGuncelle();
 
-                    /*TODO: IP'ler güncellenene kadar butonları kilitle */
                 }
 
                 private void IPleriGuncelle() {
                     Toast.makeText(context, "Sinyal Gönderilemedi", Toast.LENGTH_LONG).show();
                     Log.e("sinyalResponse:","Cihazdan hata mesajı geldi.");
 
-                    /*TODO: Bu kısım denenmedi. Farklı IP'deki bir cihaz durumu*/
                     try{
                         new IPArkaplanKontrol(context,ipSonuc).execute((Void) null);
                     }catch(Exception e){

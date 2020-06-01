@@ -12,13 +12,6 @@
         android:background="@color/arkaplan"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/sonucText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bulunan sonuçlar aşağıda listelenmiştir.\n"
-            android:visibility="gone" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/esyalarRV"
             android:layout_width="match_parent"

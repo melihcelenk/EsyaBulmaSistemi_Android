@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/* Bu sınıfın amacı cihazların IP'lerinin değişip değişmediğini kontrol etmek,
+* IP değişmişse ağı tarayarak MAC adresi eşleştirmesi yapıp IP'yi güncellemek,
+* Bağlantı kopmuşsa bunu kullanıcıya bildirmektir
+* */
+
 public class IPArkaplanKontrol extends AsyncTask<Void, Integer, String>{
     private int sonlanmaDurumu;
     ProgressBar progressBar;
@@ -76,6 +81,8 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, String>{
 //            }
 //        }
         try {
+            // BaglantiKontrol içinde başka bir asenkron işlem olduğu için onPostExecute işlem bitmeden devreye giriyor.
+            // onPostExecute içinde canlı veri kullanılarak çağıran aktiviteye tam bittiği an haber verilmektedir.
             BaglantiKontrol();
         }
         catch (Exception e) {
@@ -214,7 +221,6 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, String>{
 
         final long startTimeMillis = System.currentTimeMillis();
         try{
-            /* TODO: Lokal IP alınamadığında uygulama çöküyor*/
 
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
                 @Override

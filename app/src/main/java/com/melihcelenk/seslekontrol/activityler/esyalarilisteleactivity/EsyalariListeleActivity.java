@@ -35,6 +35,8 @@ public class EsyalariListeleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_esyalari_listele);
+        setTitle("Eşyalar");
+
         ipSonuc = new MutableLiveData<>();
         txvResult = findViewById(R.id.sonucText);
         try {
@@ -69,7 +71,7 @@ public class EsyalariListeleActivity extends AppCompatActivity {
         if(listelemeModu.equals("hepsi")){
             bulunanEsyalarArray = (ArrayList<Esya>) db.getButunEsyalar();
         }
-        else{
+        else if(listelemeModu.equals("ozelArama")){
             final String esyaAdi = intent.getStringExtra("esyaAdi");
             ArrayList<Integer> uyusanIDler =  db.esyaIdGetirEsyaAdiIle(esyaAdi);
             bulunanEsyalarArray = new ArrayList<>();

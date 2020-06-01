@@ -6,56 +6,66 @@
     android:layout_height="match_parent"
     tools:context=".activityler.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/arkaplan"
-        android:orientation="vertical"
-        android:paddingTop="40dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView4"
+        <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Durum:" />
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:scrollbars="vertical">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Yazı burada yazacak" />
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Durum:" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="44dp" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Yazı burada yazacak" />
 
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/butonlar"
-            android:gravity="center"
-            android:onClick="esyalariListeleActivityGit"
-            android:text="Eşyaları Listele" />
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="35dp" />
 
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:text="Cihazları kurmak için sol alttaki simgeye tıklayın.\n\nEşya eklemek için mikrofon simgesine dokunup '[Bölgeİsmi] ekle [Eşya Adı]' komutunu kullanın. (Örnek: Banyo ekle Diş Fırçası)\n\nEşya aramak için '[EşyaAdı] nerede' komutunu kullanın. (Örnek: Diş fırçası nerede) "
-            android:textColor="#303030"
-            android:textSize="18sp" />
+            <Button
+                android:id="@+id/esyalariListeleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/butonlar"
+                android:gravity="center"
+                android:onClick="esyalariListeleActivityGit"
+                android:text="Eşyaları Listele" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:gravity="center"
+                android:text="Cihazları kurmak için sol alttaki simgeye tıklayın.\n\nEşya eklemek için mikrofon simgesine dokunun.\n[Bölgeİsmi] ekle [Eşya Adı] komutunu kullanın.\n(Örnek: Banyo ekle Diş fırçası)\n\nEşya aramak için\n [EşyaAdı] nerede komutunu kullanın.\n(Örnek: Diş fırçası nerede) "
+                android:textColor="#303030"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/linearLayout2"

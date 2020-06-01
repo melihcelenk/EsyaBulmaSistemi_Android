@@ -107,6 +107,7 @@
             android:id="@+id/cihazKnfgKaydetBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/butonlar"
             android:text="KAYDET" />
 
     </LinearLayout>

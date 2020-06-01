@@ -41,12 +41,10 @@ public class bulunanCihaz {
     }
     private void ledYak(){
         ledYak(ip);
-        // DÜZENLENECEK: EĞER LED YANIYORSA (GET)
         if(true) ledDurum = true;
     }
     private void ledKapa(){
         ledKapa(ip);
-        // DÜZENLENECEK: EĞER LED YANMIYORSA (GET)
         if(true) ledDurum = false;
     }
     private void ledYak(String ip){

@@ -39,13 +39,10 @@ public class EsyaEkleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_esya_ekle);
+        setTitle("Eşya Ekle");
 
+        // bileşenleri tanımla
         db = new DatabaseHandler(this);
-
-        Intent intent = getIntent();
-        final String bolge = intent.getStringExtra("bolge");
-        final String esyaAdi = intent.getStringExtra("esyaAdi");
-
         esyaAdiTV = findViewById(R.id.esyaAdi_esyaEkleAct);
         bolgeTV = findViewById(R.id.bolgeTV_esyaEkleAct);
         esyaKaydetBtn = findViewById(R.id.esyaKaydetBtn_esyaEkleAct);
@@ -54,43 +51,56 @@ public class EsyaEkleActivity extends AppCompatActivity {
         anahtarKelimelerET = findViewById(R.id.anahtarKelimelerET_esyaEkleAct);
         aciklamaTV = findViewById(R.id.aciklamaTV_esyaEkleAct);
 
+        // Mikrofondan alınan verileri getir
+        Intent intent = getIntent();
+        final String bolge = intent.getStringExtra("bolge");
+        final String esyaAdi = intent.getStringExtra("esyaAdi");
+
         esyaAdiTV.setText(esyaAdi);
         bolgeTV.setText(bolge);
+
         //Eğer mikrofon kullanılmadıysa
         if(bolge==null) {
+            //Ses ile ilgili butonlar kaldırılıyor
             tekrarDeneBtn.setVisibility(View.GONE);
             anahtarKelimeleriSoyleBtn.setVisibility(View.GONE);
             aciklamaTV.setText("Yeni eşya eklemek için bilgileri girin.");
         }
 
-
+        // Kaydet butonuna basıldığında
         esyaKaydetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try{
                     String str = anahtarKelimelerET.getText().toString();
                     Log.v("AnahtarKelimeler","EditTextİçi: "+str);
+                    // Anahtar kelimeleri boşluk ile ayır ve ArrayList'e ata
                     final ArrayList<String> anahtarKelimeler= new ArrayList<String>(Arrays.asList(str.split(" ")));
-                    String bolgeAdiKaydedilen = bolgeTV.getText().toString();
 
+                    String bolgeAdiKaydedilen = bolgeTV.getText().toString();
+                    // Zikredilen bölge adı sistemde mevcut değilse kullanıcıyı uyar
                     if(db.getBolgeEtiketIle(bolgeAdiKaydedilen)==null){
                         Toast.makeText(EsyaEkleActivity.this, bolgeAdiKaydedilen + " adında bir bölge yok.", Toast.LENGTH_SHORT).show();
                     }
+                    // Bölge adı mevcut ise
                     else{
                         int eklenecekID = db.idGetirEtiketIle(bolgeAdiKaydedilen);
                         String esyaAdiKaydedilen = esyaAdiTV.getText().toString();
+                        // Eşyayı ekle ve ID'sini döndür
                         long esyaId = db.addEsya(new Esya(eklenecekID,esyaAdiKaydedilen));
+                        // Dönen ID'ye anahtar kelimeleri ekle
                         db.addEsyaAnahtarKelimeler(esyaId, anahtarKelimeler);
 
+                        // EŞYAADI kaydedildi geri bildirimi göster
                         Toast.makeText(EsyaEkleActivity.this, esyaAdiKaydedilen + " kaydedildi.", Toast.LENGTH_SHORT).show();
                         db.LogButunEsyaAnahtarKelimeler();
                         esyalariLogla();
 
+                        // Bütün Eşyaları Listele
                         Intent intent = new Intent(getApplicationContext(), EsyalariListeleActivity.class);
                         intent.putExtra("listelemeModu","hepsi");
                         startActivity(intent);
                     }
-
 
                 }catch(Exception e){
                     e.printStackTrace();
@@ -106,6 +116,7 @@ public class EsyaEkleActivity extends AppCompatActivity {
             Log.d("BolgeBilgi: ", log);
         }
     }
+    // Tekrar deneme butonuna tıklandığında mikrofon kelime almaya başlar
     public void tekrarDene(View view){
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -120,6 +131,8 @@ public class EsyaEkleActivity extends AppCompatActivity {
         }
 
     }// tekrarDene sonu
+
+    // Anahtar Kelimeleri Söyle butonuna basıldığında mikrofon kelime almaya başlar
     public void anahtarSoyle(View view){
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -140,6 +153,7 @@ public class EsyaEkleActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode){
+            // "Tekrar Dene" üzerinden geliyor ise
             case 20:
                 if(resultCode==RESULT_OK && data != null){
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
@@ -160,10 +174,13 @@ public class EsyaEkleActivity extends AppCompatActivity {
                     }
                 }
                 break;
+
+            // "Anahtar Kelimeleri Söyle üzerinden geliyor ise"
             case 30:
                 if(resultCode==RESULT_OK && data != null){
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     String str = result.get(0);
+                    // EditText'e mikrofon ile söylenen anahtar kelimeleri yaz
                     anahtarKelimelerET.setText(str);
                 }
 

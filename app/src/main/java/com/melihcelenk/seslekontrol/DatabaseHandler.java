@@ -164,9 +164,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String IPGETIR = "select ip_adresi from bolgeler where mac_adresi = \"" + macAdresi + "\"";
         Cursor cursor = db.rawQuery(IPGETIR, null);
-        if (cursor != null)
-            cursor.moveToFirst();
-        String ip = cursor.getString(0);
+        String ip = null;
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+                ip = cursor.getString(0);
+            }
+        }
+
+
         cursor.close();
         db.close();
         return ip;

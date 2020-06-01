@@ -35,31 +35,29 @@ public class KurulumActivity extends AppCompatActivity {
     ArrayList<bulunanCihaz> bulunanCihazlarArray;
     Thread tButon;
     DatabaseHandler db;
-
-    private RecyclerView cihazlarRV;
-    private cihazlarAdapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    RecyclerView cihazlarRV;
+    cihazlarAdapter mAdapter;
+    RecyclerView.LayoutManager layoutManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kurulum);
+        setTitle("Kurulum");
 
         db = new DatabaseHandler(this);
-
         sonucText = findViewById(R.id.sonucText);
         bulunanCihazlarArray = new ArrayList<bulunanCihaz>();
-
         cihazlarRV = (RecyclerView) findViewById(R.id.cihazlarRV);
-        //cihazlarRV.setHasFixedSize(true);
-        //cihazlarRV.setNestedScrollingEnabled(false);
         layoutManager = new LinearLayoutManager(this);
         cihazlarRV.setLayoutManager(layoutManager);
         mAdapter = new cihazlarAdapter(bulunanCihazlarArray);
         cihazlarRV.setAdapter(mAdapter);
 
+
         mAdapter.setOnItemClickListener(new cihazlarAdapter.OnItemClickListener() {
+            // Listelenen cihazlardan birinin üzerine tıklandığında
             @Override
             public void onItemClick(int position) {
                 bulunanCihaz bc = bulunanCihazlarArray.get(position);
@@ -69,28 +67,33 @@ public class KurulumActivity extends AppCompatActivity {
                 intent.putExtra("macAdresi",bc.getMac());
                 startActivity(intent);
             }
-
+            // Listelenen cihazlardan birinin yanındaki led yakma switch butonuna tıklandığında
             @Override
             public void onLedYakClick(int position) {
                 bulunanCihazlarArray.get(position).LedDegistir();
             }
         });
-
-        InetAddress ipAddress = IPTools.getLocalIPv4Address();
-        if (ipAddress != null){
-            // IP ADRESİ BULUNAMADI - DÜZENLENECEK
+        try{
+            InetAddress ipAddress = IPTools.getLocalIPv4Address();
+            if (ipAddress == null){
+                Toast.makeText(this, "IP adresiniz alınamadı.", Toast.LENGTH_SHORT).show();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
+
 
         // TARA BUTONU
         findViewById(R.id.taraBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Butonun başlattığı thread sürmüyorsa buton yeni bir thread başlatabilir
                 if(tButon == null || !tButon.isAlive()){
                     tButon = new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                IPBul();
+                                IPBul(); // Sistemdeki uygun cihazların IP'lerini bulur
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -114,6 +117,7 @@ public class KurulumActivity extends AppCompatActivity {
 
 
     private void sonucTextveButonDegistir(final String text, final Boolean butonDurum) {
+        // UiThread dışındaki thread'lerde Ui bileşenlerine doğrudan müdahale edilemez.
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -124,6 +128,7 @@ public class KurulumActivity extends AppCompatActivity {
         });
     }
     private void IPDiziyeEkle(final String cihazMAC, final String cihazIP) {
+        // UiThread dışındaki thread'lerde Ui bileşenlerine doğrudan müdahale edilemez.
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -133,6 +138,7 @@ public class KurulumActivity extends AppCompatActivity {
         });
     }
     private void bulunanCihazlarArrayTemizle() {
+        // UiThread dışındaki thread'lerde Ui bileşenlerine doğrudan müdahale edilemez.
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -148,19 +154,21 @@ public class KurulumActivity extends AppCompatActivity {
         //final long startTimeMillis = System.currentTimeMillis();
         try{
             SubnetDevices.fromLocalAddress().findDevices(new SubnetDevices.OnSubnetDeviceFound() {
+                // Ağda subnet cihazı bulunduğunda
                 @Override
                 public void onDeviceFound(Device device) {
                     NodeData n = null;
                     try{
+                        // Eğer bu cihaz projeye ait bir cihaz ise n'ye ata
                         n = ((n = arananCihazsaGetir(String.valueOf(device.ip))) != null) ? n : null;
                     }
                     catch(Exception e){
                         e.printStackTrace();
                     }
 
-
                     if (n!=null){
                         try {
+                            // Cihazın MAC ve IP'sini diziye ekle (NodeData ile bulunanCihaz sınıfları karıştırılmamalı, birbirleri yerine kullanılmamalıdır, NodeData Retrofit'ten çekilen veri için var)
                             IPDiziyeEkle(n.getMacAddress(), n.getIp());
                         }
                         catch (Exception e) {

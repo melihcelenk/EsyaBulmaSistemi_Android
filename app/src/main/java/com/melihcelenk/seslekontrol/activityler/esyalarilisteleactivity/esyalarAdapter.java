@@ -88,7 +88,6 @@ public class esyalarAdapter extends RecyclerView.Adapter<esyalarAdapter.MyViewHo
         holder.esyaAnahtarKelimeler.setText(simdikiAnahtar);
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return mDataset.size();

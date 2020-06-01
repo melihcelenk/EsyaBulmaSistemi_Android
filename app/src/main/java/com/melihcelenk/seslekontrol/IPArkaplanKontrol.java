@@ -109,8 +109,7 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, String>{
         super.onPostExecute(result);
 
         Log.v("OnPostExecute","sonlanmaDurumu:"+sonlanmaDurumu);
-        Toast.makeText(context, "IP değiştirme tamamlandı.???", Toast.LENGTH_SHORT).show();
-        // TODO: Buton kilitleri burada açılacak
+
         try {
             if(progressBar!=null){
                 progressBar.setVisibility(View.INVISIBLE);
@@ -120,13 +119,28 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, String>{
             e.printStackTrace();
         }
         Log.v("onPostExecute", "Güncellenemeyen bölgeler listeleniyor...");
+        String ulasilamayanCihazlar="";
         for(Bolge b : guncellenemeyenBolgeler){
             Toast.makeText(context, "Cihaza ulaşılamadı:"+b.get_etiket(), Toast.LENGTH_SHORT).show();
             Log.v("onPostExecute","Id:" + b.get_id() + " Etiket:" + b.get_etiket() + " IP:"+ b.get_ipAdresi() +" MAC:"+b.get_macAdresi());
+            ulasilamayanCihazlar += "\n- "+b.get_etiket()+" -";
         }
 
         Log.v("IPArkaplanKontrol","onPostExecute: IPArkaplanKontrol sonlandı.");
-        ipSonuc.setValue("Son");
+        if(ulasilamayanCihazlar.isEmpty()){
+            if(db.getButunBolgeler().isEmpty()){
+                ipSonuc.setValue("Henüz kurulum yapılmamış.");
+            }
+            else{
+                ipSonuc.setValue("Bütün cihazlar ulaşılabilir durumda.");
+            }
+
+        }
+        else{
+            ipSonuc.setValue("Şu cihazlara ulaşılamadı: "+ulasilamayanCihazlar);
+        }
+
+
     }//onPostExecute sonu
 
     @Override
@@ -233,9 +247,9 @@ public class IPArkaplanKontrol extends AsyncTask<Void, Integer, String>{
                 public void onFinished(ArrayList<Device> devicesFound) {
                     Log.v("IpBulOnFinished","Ağdaki Toplam Cihaz Sayısı: " + devicesFound.size() + " Uyumlu cihaz sayısı:" + bulunanCihazlarArray.size());
                     for (int i=0;i<bulunanCihazlarArray.size();i++) {
-                        Log.v("IpDegistiriliyor","Mac:"+bulunanCihazlarArray.get(i).getMac()+" eski IP:" + db.ipGetir(bulunanCihazlarArray.get(i).getMac()) + " yeniIP:"+bulunanCihazlarArray.get(i).getIp());
 
                         try{
+                            Log.v("IpDegistiriliyor","Mac:"+bulunanCihazlarArray.get(i).getMac()+" eski IP:" + db.ipGetir(bulunanCihazlarArray.get(i).getMac()) + " yeniIP:"+bulunanCihazlarArray.get(i).getIp());
                             db.ipDegistir(bulunanCihazlarArray.get(i).getMac(),bulunanCihazlarArray.get(i).getIp());
                             Log.v("IpDegistirildi","Mac:"+bulunanCihazlarArray.get(i).getMac()+" yeniIP:"+db.ipGetir(bulunanCihazlarArray.get(i).getMac()));
                             guncellenemeyenBolgeler.remove(db.getBolgeMacIle(bulunanCihazlarArray.get(i).getMac()));

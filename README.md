@@ -75,6 +75,7 @@ Eşya aradığınızda eşyanın kayıtlı olduğu bölgede LED yanıp sönecekt
 
 ## En Temel Bileşenler
 Bir Android cihaz, şekildeki gibi bir devre (NodeMCU, Breadboard, Jumperlar, Buzzer ve LED)
+
 <img src="resimler/EnTemelBilesenler.png" height="400">
 
 

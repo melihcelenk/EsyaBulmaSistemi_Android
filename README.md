@@ -3,7 +3,7 @@
 - Evinizdeki bölgeleri isimlendirin.
 - Her bölgeye bir NodeMCU kart yerleştirin
 - NodeMCU kartları aşağıdaki linkte belirtildiği gibi programlayın <b>  [[1]](#NodeMCU-Kodları) </b>
-- Android uygulamasını kurun
+- Android uygulamasını cihazınıza yükleyin
 - Uygulama üzerinden her bölgedeki cihazı kaydedin  <b>  [[2]](#Android-Uygulamasında-Kurulum) </b>
 - Eşyalarınızı dilerseniz ortadaki :heavy_plus_sign: (Eşya Ekle) butonu ile,<br>
 dilerseniz sağ alttaki :studio_microphone: (Ses Tanıma) butonu ile <b>[Bölge Adı] ekle [Eşya Adı]</b> komut dizisini kullanarak ekleyin.
@@ -16,5 +16,13 @@ dilerseniz sağ alttaki :studio_microphone: (Ses Tanıma) butonu ile <b>[Bölge 
 
 ## NodeMCU Kodları
 https://github.com/melihcelenk/EsyaBulmaSistemi_NodeMCU
+
+## Sistem Mimarisi
+<img src="resimler/SistemMimarisi.png" height="400">
+
+## Use-Case
+<img src="resimler/UseCase.png" height="400">
+
+Bu kısım düzenlenmektedir...
 
 

@@ -52,7 +52,9 @@ Eğer aynı ismin kullanıldığı başka eşyalar da var ise bunlar telefonunuz
 
 <img src="resimler/Screenshot_20200601-085242.png" height="400"><img src="resimler/Screenshot_20200601-085245.png" height="400">
 
-
+## Örnek Kullanım
+Eşya aradığınızda eşyanın kayıtlı olduğu bölgede LED yanıp sönecektir.
+<img src="resimler/ornekKullanim.jpg" height="400">
 
 ## Sistem Mimarisi
 <img src="resimler/SistemMimarisi.png" height="400"> 
@@ -61,6 +63,9 @@ Eğer aynı ismin kullanıldığı başka eşyalar da var ise bunlar telefonunuz
 ## Use-Case
 <img src="resimler/UseCase.png" height="400">
 
+## En Temel Bileşenler
+Bir Android cihaz, şekildeki gibi bir devre (NodeMCU, Breadboard, Jumperlar, Buzzer ve LED)
+<img src="resimler/EnTemelBilesenler.png" height="400">
 
 
 ## NodeMCU Kodları

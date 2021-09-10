@@ -27,7 +27,8 @@ Ulaşılmak istenen eşya doğrudan sistemde kaydedilen ismi telaffuz edilerek y
 - Evinizdeki bölgeleri isimlendirin.
 - Her bölgeye bir NodeMCU kartı istediğiniz donanımı (buzzer, LED vs.) bağlayarak yerleştirin
 - NodeMCU kartları aşağıdaki linkte belirtildiği gibi programlayın <b>  [[1]](#NodeMCU-Kodları) </b>
-- Android uygulamasını cihazınıza yükleyin
+- Kartı çalıştırdıktan sonra telefonunuzdan Wi-Fi ağlarını listeleyin ve KurulumAP ismindeki ağa bağlanın. Yönlendiricinizin SSID ve parolasını girerek kartı ağa bağlayın. Bu adımı her kart için tekrarlayın.
+- Android uygulamasını cihazınıza yükleyin ve evinizin ağına bağlanın
 - Uygulama üzerinden her bölgedeki cihazı kaydedin  <b>  [[2]](#Android-Uygulamasında-Kurulum) </b>
 - Eşyalarınızı dilerseniz ortadaki :heavy_plus_sign: (Eşya Ekle) butonu ile,<br>
 dilerseniz sağ alttaki :studio_microphone: (Ses Tanıma) butonu ile <b>[Bölge Adı] ekle [Eşya Adı]</b> komut dizisini kullanarak ekleyin. Bu aşamadan sonra sistem çalışmaya hazırdır.

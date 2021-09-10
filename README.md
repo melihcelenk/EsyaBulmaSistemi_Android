@@ -1,5 +1,18 @@
 # Ses Tanıma İle Eşya Bulma Sistemi
 
+## Özet
+Telefonunuza "Nutuk nerede?" diye sorun ve sesin geldiği yere yönelin. Işığın yanıp söndüğü raftan kitabınızı alın.
+
+### Gerekli Donanım
+NodeMCU kartlar, LED'ler, Buzzer'lar (isteğe bağlı), bir Android cihaz ve internete bağlı olması gerekmeyen bir yönlendirici
+
+<img src="resimler/Screenshot_20200601-084141.png" height="300"> <img src="resimler/Screenshot_20200601-084153.png" height="300"> <img src="resimler/ornekKullanim.jpg" height="300">
+
+## Sistem Mimarisi
+<img src="resimler/SistemMimarisi.png" height="400"> 
+
+
+### Giriş
 İnsan uygarlığının gelişmesiyle birlikte zamandan tasarruf etmek amacıyla çok  sayıda araç gereç icat edilmiştir. Bu araç gereçler boşalan vaktin farklı şekilde  kullanılmasını sağladığı gibi yeni vakit kayıplarına da neden olmuştur. Kişisel  bilgisayarlar sayesinde birçok eşya tarihe gömülmüş; çekmecelerden mektuplar,  fotoğraf albümleri, çeşitli medya oynatıcılar gibi çeşitli eşyalar kalkmıştır. Ancak  bunların yerini taşınabilir diskler, kablosuz fareler, klavyeler, dönüştürücüler, çeşitli  kablolar, şarj aletleri, monitörler, sanal gerçeklik gözlükleri gibi yeni eşyalar almıştır.  Dolayısıyla eşya boyutu azalmış, ancak eşya çeşidi artmıştır. “Bilgisayar eşyaları,  telefon eşyaları, kamera eşyaları” gibi sınıflandırmalar her iki sınıfa da girebilen  eşyalar nedeniyle yetersiz kalmış, bu da birçok eşyanın arama esnasında vakit  kaybına yol açmasıyla sonuçlanmıştır. 
 
 ### 1.1. Problemin Tanımı
@@ -56,12 +69,9 @@ Eğer aynı ismin kullanıldığı başka eşyalar da var ise bunlar telefonunuz
 Eşya aradığınızda eşyanın kayıtlı olduğu bölgede LED yanıp sönecektir.
 <img src="resimler/ornekKullanim.jpg" height="400">
 
-## Sistem Mimarisi
-<img src="resimler/SistemMimarisi.png" height="400"> 
-
 
 ## Use-Case
-<img src="resimler/UseCase.png" height="400">
+<img src="resimler/UseCase.png" height="500">
 
 ## En Temel Bileşenler
 Bir Android cihaz, şekildeki gibi bir devre (NodeMCU, Breadboard, Jumperlar, Buzzer ve LED)

@@ -4,7 +4,7 @@
 Telefonunuza "Nutuk nerede?" diye sorun ve sesin geldiği yere yönelin. Işığın yanıp söndüğü raftan kitabınızı alın.
 
 ### Gerekli Donanım
-NodeMCU kartlar, LED'ler, Buzzer'lar (isteğe bağlı), bir Android cihaz ve internete bağlı olması gerekmeyen bir yönlendirici
+NodeMCU kartlar, LED'ler, Buzzer'lar (isteğe bağlı), bir Android cihaz ve bir yönlendirici
 
 <img src="resimler/Screenshot_20200601-084141.png" height="300"> <img src="resimler/Screenshot_20200601-084153.png" height="300"> <img src="resimler/ornekKullanim.jpg" height="300">
 

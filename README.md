@@ -67,6 +67,7 @@ Eğer aynı ismin kullanıldığı başka eşyalar da var ise bunlar telefonunuz
 
 ## Örnek Kullanım
 Eşya aradığınızda eşyanın kayıtlı olduğu bölgede LED yanıp sönecektir.
+
 <img src="resimler/ornekKullanim.jpg" height="400">
 
 
